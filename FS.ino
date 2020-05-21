@@ -34,11 +34,14 @@ void FS_init(void) {
   //                                                 WIFI
   //==========================================================================================================
   server.on("/ssid", HTTP_GET, []() {
-    jsonWrite(configSetup, "input", 7, String(server.arg("input[7]")));  //ssidAP
-    jsonWrite(configSetup, "input", 8, String(server.arg("input[8]")));  //ssidAP_PASS
-    jsonWrite(configSetup, "input", 9, String(server.arg("input[9]")));  //ssid
-    jsonWrite(configSetup, "input", 10, String(server.arg("input[10]")));//ssid_PASS
-    jsonWrite(configSetup, "input", 11, String(server.arg("input[11]")));//web_port  
+    CheckDelay = server.arg("input[16]").toInt();
+    n = CheckDelay;
+    jsonWrite(configSetup, "input", 11, String(server.arg("input[11]")));  //ssidAP
+    jsonWrite(configSetup, "input", 12, String(server.arg("input[12]")));  //ssidAP_PASS
+    jsonWrite(configSetup, "input", 13, String(server.arg("input[13]")));  //ssid
+    jsonWrite(configSetup, "input", 14, String(server.arg("input[14]")));//ssid_PASS
+    jsonWrite(configSetup, "input", 15, String(server.arg("input[15]")));//web_port
+    jsonWrite(configSetup, "input", 16, CheckDelay);
     saveConfigSetup();
     server.send(200, "text/plain", "");
   });
@@ -49,7 +52,7 @@ void FS_init(void) {
     jsonWrite(configSetup, "defaultLang", String(server.arg("defaultLang")));
     saveConfigSetup();
     server.send(200, "text/plain", "");
-  });  
+  });
   //==========================================================================================================
   //                                                 UPDATE FS
   //==========================================================================================================
@@ -110,10 +113,10 @@ void FS_init(void) {
   //                                                 MANUAL SYNCHRONISATION
   //==========================================================================================================
   server.on("/save_date", HTTP_GET, []() {
-    date_man   = server.arg("input[12]");
-    time_man   = server.arg("input[13]");
-    jsonWrite(configSetup, "input", 12, date_man);
-    jsonWrite(configSetup, "input", 13, time_man);
+    date_man   = server.arg("input[7]");
+    time_man   = server.arg("input[8]");
+    jsonWrite(configSetup, "input", 7, date_man);
+    jsonWrite(configSetup, "input", 8, time_man);
     years = date_man.substring(0, 4).toInt();
     months = date_man.substring(5, 7).toInt();
     days = date_man.substring(8, 10).toInt();
@@ -131,11 +134,13 @@ void FS_init(void) {
   //                                                 AUTO SYNCHRONISATION
   //==========================================================================================================
   server.on("/auto_sync", HTTP_GET, []() {
-    timeZone = server.arg("input[14]").toInt();
-    jsonWrite(configSetup, "input", 14, timeZone);
+    timeZone = server.arg("input[9]").toInt();
+    ntpServerName = server.arg("input[10]").c_str();
+    jsonWrite(configSetup, "input", 9, timeZone);
+    jsonWrite(configSetup, "input", 10, String(ntpServerName));
     saveConfigSetup();
     updateTimeNTP();
-    if (years < 2019) {
+    if (!cb) {
       printLCD(2, 0, 0, "  NO INTERNET   ", "   CONNECTION   ", 2000);
       printLCD(2, 0, 0, "                ", "                ", 0);
       server.send(404, "text/plain", "");
@@ -154,7 +159,7 @@ void FS_init(void) {
     selIndex = server.arg("selIndex").toInt();
     for (int b = 0; b <= 6; b++) {
       for (int c = 0; c <= 3; c++) {
-        schedule[selIndex][b][c]= server.arg("schedule["+String(selIndex)+"]["+String(b)+"]["+String(c)+"]");
+        schedule[selIndex][b][c] = server.arg("schedule[" + String(selIndex) + "][" + String(b) + "][" + String(c) + "]");
         jsonWrite(configSetup, "schedule", selIndex, b, c, schedule[selIndex][b][c]);
       }
     }
@@ -163,12 +168,12 @@ void FS_init(void) {
     printLCD(1, 0, 0, "", " SAVE SCHEDULE  ", 1000);
     printLCD(1, 0, 0, "", "                ", 0);
     server.send(200, "text/plain", "");
-  });  
+  });
   //==========================================================================================================
   //                                                 SAVE TRANSMITTERS
   //==========================================================================================================
   server.on("/save", HTTP_GET, []() {
-  //atof(server.arg("fan_start").c_str());
+    //atof(server.arg("fan_start").c_str());
     temp_koef = server.arg("input[0]").toFloat();
     max_day   = server.arg("input[1]").toInt();
     max_night = server.arg("input[2]").toInt();
@@ -188,6 +193,16 @@ void FS_init(void) {
     printLCD(1, 0, 0, "", "                ", 0);
     server.send(200, "text/plain", "");
   });
+  //==========================================================================================================
+  //                                                 SAVE CHART DAY
+  //==========================================================================================================
+  server.on("/chartDays", HTTP_GET, []() {
+    int chartDays = server.arg("input[16]").toInt();
+    jsonWrite(configSetup, "input", 16, chartDays);
+    saveConfigSetup();
+    server.send(200, "text/plain", "");
+  });
+
 }
 //==========================================================================================================
 //                                                 RESTART ESP
@@ -237,44 +252,71 @@ bool handleFileRead(String path) {
 }
 
 void handleFileUpload() {
-  if (server.uri() != "/edit") { return; }
+  if (server.uri() != "/edit") {
+    return;
+  }
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
-    if (!filename.startsWith("/")) { filename = "/" + filename; }
+    if (!filename.startsWith("/")) {
+      filename = "/" + filename;
+    }
     fsUploadFile = SPIFFS.open(filename, "w");
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
-      if (fsUploadFile) { fsUploadFile.write(upload.buf, upload.currentSize); }
-  } else if (upload.status == UPLOAD_FILE_END) { 
-      if (fsUploadFile) { fsUploadFile.close(); }
+    if (fsUploadFile) {
+      fsUploadFile.write(upload.buf, upload.currentSize);
+    }
+  } else if (upload.status == UPLOAD_FILE_END) {
+    if (fsUploadFile) {
+      fsUploadFile.close();
+    }
   }
 }
 
 void handleFileDelete() {
-  if (server.args() == 0) { return server.send(500, "text/plain", "BAD ARGS"); }
+  if (server.args() == 0) {
+    return server.send(500, "text/plain", "BAD ARGS");
+  }
   String path = server.arg(0);
-  if (path == "/") { return server.send(500, "text/plain", "BAD PATH"); }
-  if (!SPIFFS.exists(path)) { return server.send(404, "text/plain", "FileNotFound"); }
+  if (path == "/") {
+    return server.send(500, "text/plain", "BAD PATH");
+  }
+  if (!SPIFFS.exists(path)) {
+    return server.send(404, "text/plain", "FileNotFound");
+  }
   SPIFFS.remove(path);
   server.send(200, "text/plain", "");
   path = String();
 }
 
 void handleFileCreate() {
-  if (server.args() == 0) { return server.send(500, "text/plain", "BAD ARGS"); }
+  if (server.args() == 0) {
+    return server.send(500, "text/plain", "BAD ARGS");
+  }
   String path = server.arg(0);
-  if (path == "/") { return server.send(500, "text/plain", "BAD PATH"); }
-  if (SPIFFS.exists(path)) { return server.send(500, "text/plain", "FILE EXISTS"); }
+  if (path == "/") {
+    return server.send(500, "text/plain", "BAD PATH");
+  }
+  if (SPIFFS.exists(path)) {
+    return server.send(500, "text/plain", "FILE EXISTS");
+  }
   File file = SPIFFS.open(path, "w");
-  if (file) { file.close(); } 
-  else { return server.send(500, "text/plain", "CREATE FAILED"); }
+  if (file) {
+    file.close();
+  }
+  else {
+    return server.send(500, "text/plain", "CREATE FAILED");
+  }
   server.send(200, "text/plain", "");
   path = String();
 }
 
 void handleFileList() {
-  if (!server.hasArg("dir")) { server.send(500, "text/plain", "BAD ARGS"); return;  }
+  if (!server.hasArg("dir")) {
+    server.send(500, "text/plain", "BAD ARGS");
+    return;
+  }
   String path = server.arg("dir");
   Dir dir = SPIFFS.openDir(path);
   path = String();
@@ -282,13 +324,19 @@ void handleFileList() {
   String output = "[";
   while (dir.next()) {
     File entry = dir.openFile("r");
-    if (output != "[") { output += ','; }
+    if (output != "[") {
+      output += ',';
+    }
     bool isDir = false;
     output += "{\"type\":\"";
     output += (isDir) ? "dir" : "file";
     output += "\",\"name\":\"";
-    if (entry.name()[0] == '/') { output += &(entry.name()[1]); } 
-    else { output += entry.name(); }
+    if (entry.name()[0] == '/') {
+      output += &(entry.name()[1]);
+    }
+    else {
+      output += entry.name();
+    }
     output += "\"}";
     entry.close();
   }

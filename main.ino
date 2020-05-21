@@ -146,6 +146,14 @@ String jsonWrite(String &json, String name, int a, int b, float volume) {
   root.printTo(json);
   return json;
 }
+String jsonWrite(String &json, String name, int a, int b, int c, float volume) {
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(json);
+  root[name][a][b][c] = volume;
+  json = "";
+  root.printTo(json);
+  return json;
+}
 void saveConfigSetup () {
   writeFile("configSetup.json", configSetup );
 }

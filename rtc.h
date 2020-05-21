@@ -19,14 +19,14 @@ String time_0[7], time_1[7], time_2[7], time_3[7];
 int hour_0[7], min_0[7], hour_1[7], min_1[7], hour_2[7], min_2[7], hour_3[7], min_3[7];
 long sec_0, sec_1, sec_2, sec_3, sec_now;
 String schedule[3][10][10];
-int ds_day, ds_month, ds_year, ds_hour, ds_min, ds_sec;
+int ds_day_old, ds_day, ds_month, ds_year, ds_hour, ds_min, ds_sec;
 char time_now[30], date_now[30];
 int hours, minutes, seconds, years, months, days;
 int timeZone = 5;
 unsigned int localPort = 8888;
-
+int cb;
 IPAddress timeServerIP;
-const char* ntpServerName = "time.nist.gov";
+const char* ntpServerName;
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[ NTP_PACKET_SIZE];
 
@@ -49,7 +49,7 @@ void updateTimeNTP() {
   WiFi.hostByName(ntpServerName, timeServerIP);
   sendNTPpacket(timeServerIP);
   delay(1000);
-  int cb = udp.parsePacket();
+  cb = udp.parsePacket();
   if (!cb) {
     Serial.println("Can't connect to the server");
   } else {

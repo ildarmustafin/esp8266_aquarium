@@ -1,21 +1,21 @@
 void printLCD(byte colEmpty, byte c0, byte c1, String line1, String line2, int zaderjka) {
-    switch (colEmpty) {
-      case 0:
-        lcd.setCursor(c0, 0);
-        lcd.print(line1);
-        break;
-      case 1:
-        lcd.setCursor(c1, 1);
-        lcd.print(line2);
-        break;
-      case 2:
-        lcd.setCursor(c0, 0);
-        lcd.print(line1);
-        lcd.setCursor(c1, 1);
-        lcd.print(line2);
-        break;
-    }
-    delay(zaderjka);
+  switch (colEmpty) {
+    case 0:
+      lcd.setCursor(c0, 0);
+      lcd.print(line1);
+      break;
+    case 1:
+      lcd.setCursor(c1, 1);
+      lcd.print(line2);
+      break;
+    case 2:
+      lcd.setCursor(c0, 0);
+      lcd.print(line1);
+      lcd.setCursor(c1, 1);
+      lcd.print(line2);
+      break;
+  }
+  delay(zaderjka);
 }
 void updateZnak(byte printB, bool value, byte col, byte row) {
   if (value) {
@@ -26,7 +26,8 @@ void updateZnak(byte printB, bool value, byte col, byte row) {
     lcd.print(" ");
   }
 }
-void updateZnak(String printB, bool value, byte col, byte row) {
+/*
+  void updateZnak(String printB, bool value, byte col, byte row) {
   if (value) {
     lcd.setCursor(col, row);
     lcd.print(printB);
@@ -34,7 +35,8 @@ void updateZnak(String printB, bool value, byte col, byte row) {
     lcd.setCursor(col, row);
     lcd.print(" ");
   }
-}
+  }
+*/
 void initLCD() {
   lcd.begin();
   lcd.backlight();
@@ -43,7 +45,6 @@ void initLCD() {
   lcd.createChar(4, znak_fan);
   lcd.createChar(5, znak_ten);
   lcd.createChar(6, znak_ws);
-//lcd.createChar(7, znak_temp);
   lcd.createChar(7, znak_rel1);
   lcd.createChar(8, znak_rel2);
 }

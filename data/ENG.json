@@ -1,11 +1,11 @@
 {
-"tab":["Chart","Schedule","Transmitters", "Options"],
 "sch_title":[
 ["LED Schedule","Relay Schedule"],
 ["Dawn","Sunset","from","to","from","to"],
 ["Relay 1","Relay 2","on","off","on","off"]],
-"text_h":["MO:","TU:","WE:","TH:","FR:","SA:","SU:","Temperature correction:","Max bright:","Min bright:","Fan on:","Fan off:","Heater on:","Heater off:","AP name:",
-"Connect to WIFI:","Port:","Date:","Time:","Timezone [GMT+]:","Firmware update:","Restart controller ESP8266-12E:","Restart ESP8266-12E?", "Reboot is required"],
+"text_h":["MO:","TU:","WE:","TH:","FR:","SA:","SU:","Temperature correction:","Max bright:","Min bright:","Fan on:","Fan off:","Heater on:","Heater off:",
+"Date:","Time:","Timezone [GMT+]:","NTP-Server","AP name:","Connect to WIFI:","Port:", "Firmware update:","Restart controller ESP8266:", "Reconnet [sec]:",
+"Day quantity [2..28]:", "Restart ESP8266-12E?", "Reboot is required"],
 "but":["Loading...","Successful","Error","Manual enter","Autosync","Save schedule","Save","Open","Upload","Restart"],
 "mes":["FAILURE","RTC FAILURE","RTC ERROR"]
 }
