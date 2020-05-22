@@ -9,7 +9,6 @@ void FS_init(void) {
     size_t fileSize = dir.fileSize();
   }
   server.on("/readValues", send_values_by_websocket);
-  server.on("/restart", handle_restart);
   server.on("/list", HTTP_GET, handleFileList);
   server.on("/edit", HTTP_GET, []() {
     if (!handleFileRead("/edit.htm")) server.send(404, "text/plain", "FileNotFound");
@@ -33,7 +32,7 @@ void FS_init(void) {
   //==========================================================================================================
   //                                                 WIFI
   //==========================================================================================================
-  server.on("/ssid", HTTP_GET, []() {
+  server.on("/ssid", HTTP_POST, []() {
     CheckDelay = server.arg("input[16]").toInt();
     n = CheckDelay;
     jsonWrite(configSetup, "input", 11, String(server.arg("input[11]")));  //ssidAP
@@ -156,6 +155,7 @@ void FS_init(void) {
   //                                                 SAVE LED SCHEDULE
   //==========================================================================================================
   server.on("/save_schedule", HTTP_GET, []() {
+    Serial.println("SAVE SCHEDULE: OK");  
     selIndex = server.arg("selIndex").toInt();
     for (int b = 0; b <= 6; b++) {
       for (int c = 0; c <= 3; c++) {
@@ -173,6 +173,7 @@ void FS_init(void) {
   //                                                 SAVE TRANSMITTERS
   //==========================================================================================================
   server.on("/save", HTTP_GET, []() {
+    Serial.println("SAVE TRANSMITTERS: OK");        
     //atof(server.arg("fan_start").c_str());
     temp_koef = server.arg("input[0]").toFloat();
     max_day   = server.arg("input[1]").toInt();
@@ -197,26 +198,28 @@ void FS_init(void) {
   //                                                 SAVE CHART DAY
   //==========================================================================================================
   server.on("/chartDays", HTTP_GET, []() {
-    int chartDays = server.arg("input[16]").toInt();
-    jsonWrite(configSetup, "input", 16, chartDays);
+    Serial.println("SAVE CHART DAYS: OK");
+    int chartDays = server.arg("input[17]").toInt();
+    jsonWrite(configSetup, "input", 17, chartDays);
     saveConfigSetup();
     server.send(200, "text/plain", "");
   });
-
-}
-//==========================================================================================================
-//                                                 RESTART ESP
-//==========================================================================================================
-void handle_restart() {
-  String restart = server.arg("device");
-  if (restart == "1") {
-    server.send(200, "text/plain", "Restarting. Please wait...");
-    printLCD(2, 0, 0, "   RESTARTING   ", "PLEASE WAIT...  ", 500);
-    printLCD(2, 0, 0, "                ", "                ", 0);
-    ESP.restart();
-  } else {
-    server.send(400, "text/plain", "ERROR Restarting");
-  }
+  //==========================================================================================================
+  //                                                 RESTART ESP
+  //==========================================================================================================
+  server.on("/restart", HTTP_POST, []() {
+    Serial.println("RESTART ESP8266. WAIT"); 
+    String restart = server.arg("device");
+    if (restart == "1") {
+      server.send(200, "text/plain", "");
+      printLCD(2, 0, 0, "   RESTARTING   ", "PLEASE WAIT...  ", 500);
+      printLCD(2, 0, 0, "                ", "                ", 0);
+      ESP.restart();
+    } else {
+      server.send(400, "text/plain", "ERROR Restarting");
+    }
+    server.send(200, "text/plain", "");
+  });
 }
 
 String getContentType(String filename) {
