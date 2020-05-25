@@ -56,23 +56,25 @@ void led_schedule() {
     sec_2   = hour_2[nedelya] * 60 * 60 + min_2[nedelya] * 60;
     sec_3   = hour_3[nedelya] * 60 * 60 + min_3[nedelya] * 60;
     sec_now = ds_hour * 60 * 60 + ds_min * 60 + ds_sec;
-    if (sec_now < sec_0 || sec_now > sec_3) {
-      analogWrite(LEDPIN, max_night_percent);
-      led_bright = max_night;
-      led_working = 0;
-    }
+    //Serial.printf("led_bright: %i | val_rassvet: %i | val_zakat: %i | max_day: %i | max_day_percent: %i | max_night: %i | max_night_percent: %i\n", led_bright, val_rassvet, val_zakat, max_day, max_day_percent, max_night, max_night_percent);
+//=============================================================================================================
     if (sec_now >= sec_0 && sec_now <= sec_1) {     // Рассвет
       val_rassvet = map(sec_now, sec_0, sec_1, max_night_percent, max_day_percent);
       led_bright = map(sec_now, sec_0, sec_1, max_night, max_day);
       analogWrite(LEDPIN, val_rassvet);
       led_working = 1;
+    } else if (sec_now < sec_0 || sec_now > sec_3) { //после заката и до рассвета
+      analogWrite(LEDPIN, max_night_percent);
+      led_bright = max_night;
+      led_working = 0;
     }
+//=============================================================================================================
     if (sec_now >= sec_2 && sec_now <= sec_3) { // Закат
       val_zakat = map(sec_now, sec_2, sec_3, max_day_percent, max_night_percent);
       led_bright = map(sec_now, sec_2, sec_3, max_day, max_night);
       analogWrite(LEDPIN, val_zakat);
       led_working = 1;
-    } else if (sec_now > sec_1 && sec_now < sec_2) {
+    } else if (sec_now > sec_1 && sec_now < sec_2) { //после рассвета и до заката
       analogWrite(LEDPIN, max_day_percent);
       led_bright = max_day;
       led_working = 1;

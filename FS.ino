@@ -182,6 +182,8 @@ void FS_init(void) {
     fan_stop  = server.arg("input[4]").toFloat();
     ten_start = server.arg("input[5]").toFloat();
     ten_stop  = server.arg("input[6]").toFloat();
+    max_day_percent   = map(max_day, 0, 100, 0, 1024);
+    max_night_percent = map(max_night, 100, 0, 1024, 0);
     jsonWrite(configSetup, "input", 0, temp_koef);
     jsonWrite(configSetup, "input", 1, max_day);
     jsonWrite(configSetup, "input", 2, max_night);
