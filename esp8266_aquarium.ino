@@ -1,9 +1,9 @@
 #include "include_define.h"
 #include "rtc.h"
 #include "ruswords.h"
-//==========================================================================================================
-//                                                 INITIAL SETUP
-//==========================================================================================================
+//==========================================================================================================//
+//                                                 INITIAL SETUP                                            //
+//==========================================================================================================//
 void setup() {
   pinMode(LEDPIN, OUTPUT);
   pinMode(FANPIN, OUTPUT);
@@ -26,27 +26,45 @@ void setup() {
   //Serial.setDebugOutput(true);
   configSetup  = readFile("configSetup.json", 4096);
   configChart  = readFile("configChart.json", 4096);
-  readJsonValues();
+  if (configSetup == "Failed") {
+    Serial.printf("\nERROR OPENING configSetup.json\n");
+    printLCD(2, 0, 0, "ERROR OPENING   ", "configSetup.json", 1000);
+    printLCD(2, 0, 0, "                ", "                ", 0);
+  } else {
+    readJsonValues();
+  }
+  if (configChart == "Failed") {
+    Serial.printf("ERROR OPENING configChart.json\n");
+    printLCD(2, 0, 0, "ERROR OPENING   ", "configChart.json", 1000);
+    printLCD(2, 0, 0, "                ", "                ", 0);
+  }
   server.begin(port);
-  WIFIinit();
+  initSTA();
   if (WiFi.getAutoConnect() != true) {
     WiFi.setAutoConnect(true);
     WiFi.setAutoReconnect(true);
   }
-  rtc.begin();
-  avg.begin();
+  sensors.begin();
   udp.begin(localPort);
+  rtc.begin();
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);  
+
+  ts.add(0, 1000, [&](void *) {
+    check_connection();
+    measure_datetime();
+  }, nullptr, true);
+  ts.add(1, 500, [&](void *) {
+    send_values_by_websocket();
+  }, nullptr, true);
+
 }
-//==========================================================================================================
-//                                                 LOOP
-//==========================================================================================================
+//==========================================================================================================//
+//                                                 LOOP                                                     //
+//==========================================================================================================//
 void loop() {
+  ts.update();
   server.handleClient();
-  yield();
-  measure_t();
   webSocket.loop();
+  yield();
 }

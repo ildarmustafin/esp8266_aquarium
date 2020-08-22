@@ -1,3 +1,10 @@
+char* convertValue(char* curValue, byte maxLengthValue) {
+  const char* probel[5] = {"", " ", "  ", "   ", "    "};
+  char result[256];
+  sprintf(result, "%s%s",  curValue, probel[maxLengthValue - strlen(curValue)]);
+  return result;
+}
+
 void printLCD(byte colEmpty, byte c0, byte c1, String line1, String line2, int zaderjka) {
   switch (colEmpty) {
     case 0:

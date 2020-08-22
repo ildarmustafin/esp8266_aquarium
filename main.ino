@@ -154,17 +154,31 @@ String jsonWrite(String &json, String name, int a, int b, int c, float volume) {
   root.printTo(json);
   return json;
 }
-void saveConfigSetup () {
+void saveConfigSetup() {
   writeFile("configSetup.json", configSetup );
 }
 
-void saveConfigChart () {
-  writeFile("configChart.json", configChart );
+void saveConfigChart() {
+  writeFile("configChart.json", configChart);
 }
 
+void saveLog() {
+  appendFile("log.txt", configLog);
+}
+// ------------- Добавление строки в файл
+String appendFile(String fileName, String strings ) {
+  File configFile = LittleFS.open("/" + fileName, "a+");
+  if (!configFile) {
+    return "Failed to open config file";
+  }
+  configFile.print(strings);
+  //strings.printTo(configFile);
+  configFile.close();
+  return "Write success";
+}
 // ------------- Запись строки в файл
 String writeFile(String fileName, String strings ) {
-  File configFile = SPIFFS.open("/" + fileName, "w");
+  File configFile = LittleFS.open("/" + fileName, "w");
   if (!configFile) {
     return "Failed to open config file";
   }
@@ -176,7 +190,7 @@ String writeFile(String fileName, String strings ) {
 
 // ------------- Чтение файла в строку
 String readFile(String fileName, size_t len ) {
-  File configFile = SPIFFS.open("/" + fileName, "r");
+  File configFile = LittleFS.open("/" + fileName, "r");
   if (!configFile) {
     return "Failed";
   }

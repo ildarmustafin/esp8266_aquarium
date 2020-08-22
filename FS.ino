@@ -1,9 +1,10 @@
-//==========================================================================================================
-//                                                 FILE SYSTEM OPTIONS
-//==========================================================================================================
+//==========================================================================================================//
+//                                                 FILE SYSTEM OPTIONS                                      //
+//==========================================================================================================//
 void FS_init(void) {
-  SPIFFS.begin();
-  Dir dir = SPIFFS.openDir("/");
+  LittleFS.begin();
+
+  Dir dir = LittleFS.openDir("/");
   while (dir.next()) {
     String fileName = dir.fileName();
     size_t fileSize = dir.fileSize();
@@ -22,39 +23,43 @@ void FS_init(void) {
   server.onNotFound([]() {
     if (!handleFileRead(server.uri()))
       server.send(404, "text/plain", "FileNotFound. Please upload FS to ESP8266");
-
   });
   //  jsonWrite(configSetup, "flashChip", String(ESP.getFlashChipId(), HEX));
   server.on("/configSetup.json", HTTP_GET, []() {
     server.send(200, "application/json", configSetup);
   });
 
-  //==========================================================================================================
-  //                                                 WIFI
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 WIFI                                                     //
+  //==========================================================================================================//
   server.on("/ssid", HTTP_POST, []() {
-    CheckDelay = server.arg("input[16]").toInt();
+    ip.fromString(server.arg("input[3][8]").c_str());
+    ip_gw.fromString(server.arg("input[3][9]").c_str());
+    port       = server.arg("input[3][10]").toInt();
+    CheckDelay = server.arg("input[3][11]").toInt();
     n = CheckDelay;
-    jsonWrite(configSetup, "input", 11, String(server.arg("input[11]")));  //ssidAP
-    jsonWrite(configSetup, "input", 12, String(server.arg("input[12]")));  //ssidAP_PASS
-    jsonWrite(configSetup, "input", 13, String(server.arg("input[13]")));  //ssid
-    jsonWrite(configSetup, "input", 14, String(server.arg("input[14]")));//ssid_PASS
-    jsonWrite(configSetup, "input", 15, String(server.arg("input[15]")));//web_port
-    jsonWrite(configSetup, "input", 16, CheckDelay);
+    jsonWrite(configSetup, "input", 3, 4, String(server.arg("input[3][4]")));  //ssidAP
+    jsonWrite(configSetup, "input", 3, 5, String(server.arg("input[3][5]")));  //ssidAP_PASS
+    jsonWrite(configSetup, "input", 3, 6, String(server.arg("input[3][6]")));  //ssid
+    jsonWrite(configSetup, "input", 3, 7, String(server.arg("input[3][7]")));  //ssid_PASS
+    jsonWrite(configSetup, "input", 3, 8, ip.toString());                      //ip
+    jsonWrite(configSetup, "input", 3, 9, ip_gw.toString());                   //ip_gateway
+    jsonWrite(configSetup, "input", 3, 10, port);                              //web_port
+    jsonWrite(configSetup, "input", 3, 11, CheckDelay);
     saveConfigSetup();
     server.send(200, "text/plain", "");
   });
-  //==========================================================================================================
-  //                                                 DEFAULT LANG SAVE
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 DEFAULT LANG SAVE                                        //
+  //==========================================================================================================//
   server.on("/lang", HTTP_GET, []() {
     jsonWrite(configSetup, "defaultLang", String(server.arg("defaultLang")));
     saveConfigSetup();
     server.send(200, "text/plain", "");
   });
-  //==========================================================================================================
-  //                                                 UPDATE FS
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 UPDATE FS                                                //
+  //==========================================================================================================//
   server.on("/update", HTTP_POST, [&]() {
     if (Update.hasError()) {
       server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
@@ -108,35 +113,31 @@ void FS_init(void) {
     yield();
   });
 
-  //==========================================================================================================
-  //                                                 MANUAL SYNCHRONISATION
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 MANUAL SYNCHRONISATION                                   //
+  //==========================================================================================================//
   server.on("/save_date", HTTP_GET, []() {
-    date_man   = server.arg("input[7]");
-    time_man   = server.arg("input[8]");
-    jsonWrite(configSetup, "input", 7, date_man);
-    jsonWrite(configSetup, "input", 8, time_man);
-    years = date_man.substring(0, 4).toInt();
-    months = date_man.substring(5, 7).toInt();
-    days = date_man.substring(8, 10).toInt();
-    hours = time_man.substring(0, 2).toInt();
-    minutes = time_man.substring(3, 5).toInt();
-    seconds = time_man.substring(6, 8).toInt();
+    String date_man = server.arg("input[3][0]");
+    String time_man = server.arg("input[3][1]");
+    sscanf(date_man.c_str(), "%i-%d-%d", &years, &months, &days);
+    sscanf(time_man.c_str(), "%d:%d:%d", &hours, &minutes, &seconds);
+    jsonWrite(configSetup, "input", 3, 0, date_man);
+    jsonWrite(configSetup, "input", 3, 1, time_man);
     saveConfigSetup();
     rtc.adjust(DateTime(years, months, days, hours, minutes, seconds));
-    Serial.printf("Manual button pressed \nEntered time: %02d.%02d.%02i | %02d:%02d:%02d \n", days, months, years, hours, minutes, seconds);
+    Serial.printf("Manual button pressed \nEntered time: %02d.%02d.%02i | %02d:%02d:%02d\n", days, months, years, hours, minutes, seconds);
     printLCD(1, 0, 0, "", " MANUAL PRESSED ", 2000);
     printLCD(1, 0, 0, "", "                ", 0);
     server.send(200, "text/plain", "");
   });
-  //==========================================================================================================
-  //                                                 AUTO SYNCHRONISATION
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 AUTO SYNCHRONISATION                                     //
+  //==========================================================================================================//
   server.on("/auto_sync", HTTP_GET, []() {
-    timeZone = server.arg("input[9]").toInt();
-    ntpServerName = server.arg("input[10]").c_str();
-    jsonWrite(configSetup, "input", 9, timeZone);
-    jsonWrite(configSetup, "input", 10, String(ntpServerName));
+    timeZone = server.arg("input[3][2]").toInt();
+    ntpServerName = server.arg("input[3][3]").c_str();
+    jsonWrite(configSetup, "input", 3, 2, timeZone);
+    jsonWrite(configSetup, "input", 3, 3, String(ntpServerName));
     saveConfigSetup();
     updateTimeNTP();
     if (!cb) {
@@ -145,18 +146,18 @@ void FS_init(void) {
       server.send(404, "text/plain", "");
     } else {
       rtc.adjust(DateTime(years, months, days, hours, minutes, seconds));
-      Serial.printf("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d \n", days, months, years, hours, minutes, seconds);
+      Serial.printf("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", days, months, years, hours, minutes, seconds);
       printLCD(1, 0, 0, "", "AUTOSYNC PRESSED", 2000);
       printLCD(1, 0, 0, "", "                ", 0);
       server.send(200, "text/plain", "");
     }
   });
-  //==========================================================================================================
-  //                                                 SAVE LED SCHEDULE
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 SAVE LED SCHEDULE                                        //
+  //==========================================================================================================//
   server.on("/save_schedule", HTTP_GET, []() {
-    Serial.println("SAVE SCHEDULE: OK");  
-    selIndex = server.arg("selIndex").toInt();
+    Serial.println("SAVE SCHEDULE: OK");
+    byte selIndex = server.arg("selIndex").toInt();
     for (int b = 0; b <= 6; b++) {
       for (int c = 0; c <= 3; c++) {
         schedule[selIndex][b][c] = server.arg("schedule[" + String(selIndex) + "][" + String(b) + "][" + String(c) + "]");
@@ -169,48 +170,84 @@ void FS_init(void) {
     printLCD(1, 0, 0, "", "                ", 0);
     server.send(200, "text/plain", "");
   });
-  //==========================================================================================================
-  //                                                 SAVE TRANSMITTERS
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 SAVE TRANSMITTERS                                        //
+  //==========================================================================================================//
   server.on("/save", HTTP_GET, []() {
-    Serial.println("SAVE TRANSMITTERS: OK");        
+    Serial.println("SAVE TRANSMITTERS: OK");
     //atof(server.arg("fan_start").c_str());
-    temp_koef = server.arg("input[0]").toFloat();
-    max_day   = server.arg("input[1]").toInt();
-    max_night = server.arg("input[2]").toInt();
-    fan_start = server.arg("input[3]").toFloat();
-    fan_stop  = server.arg("input[4]").toFloat();
-    ten_start = server.arg("input[5]").toFloat();
-    ten_stop  = server.arg("input[6]").toFloat();
-    max_day_percent   = map(max_day, 0, 100, 0, 1024);
-    max_night_percent = map(max_night, 100, 0, 1024, 0);
-    jsonWrite(configSetup, "input", 0, temp_koef);
-    jsonWrite(configSetup, "input", 1, max_day);
-    jsonWrite(configSetup, "input", 2, max_night);
-    jsonWrite(configSetup, "input", 3, fan_start);
-    jsonWrite(configSetup, "input", 4, fan_stop);
-    jsonWrite(configSetup, "input", 5, ten_start);
-    jsonWrite(configSetup, "input", 6, ten_stop);
+    temp_koef = server.arg("input[1][0]").toFloat();
+    max_day_percent   = server.arg("input[1][1]").toInt();
+    max_night_percent = server.arg("input[1][2]").toInt();
+    fan_start = server.arg("input[1][3]").toFloat();
+    fan_stop  = server.arg("input[1][4]").toFloat();
+    ten_start = server.arg("input[1][5]").toFloat();
+    ten_stop  = server.arg("input[1][6]").toFloat();
+    max_day   = max_day_percent * maxPWM / 100;   // x = 100 * 1009 / 100 = 100
+    max_night = max_night_percent * maxPWM / 100; // x = 0 * 1009 / 100 = 0
+
+    jsonWrite(configSetup, "input", 1, 0, temp_koef);
+    jsonWrite(configSetup, "input", 1, 1, max_day_percent);
+    jsonWrite(configSetup, "input", 1, 2, max_night_percent);
+    jsonWrite(configSetup, "input", 1, 3, fan_start);
+    jsonWrite(configSetup, "input", 1, 4, fan_stop);
+    jsonWrite(configSetup, "input", 1, 5, ten_start);
+    jsonWrite(configSetup, "input", 1, 6, ten_stop);
     saveConfigSetup();
     printLCD(1, 0, 0, "", "  SAVE OPTIONS  ", 1000);
     printLCD(1, 0, 0, "", "                ", 0);
     server.send(200, "text/plain", "");
   });
-  //==========================================================================================================
-  //                                                 SAVE CHART DAY
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 SAVE CHART DAY                                           //
+  //==========================================================================================================//
   server.on("/chartDays", HTTP_GET, []() {
     Serial.println("SAVE CHART DAYS: OK");
-    int chartDays = server.arg("input[17]").toInt();
-    jsonWrite(configSetup, "input", 17, chartDays);
+    int chartDays = server.arg("input[0][0]").toInt();
+    jsonWrite(configSetup, "input", 0, 0, chartDays);
     saveConfigSetup();
     server.send(200, "text/plain", "");
   });
-  //==========================================================================================================
-  //                                                 RESTART ESP
-  //==========================================================================================================
+  //==========================================================================================================//
+  //                                                 SAVE S_MODE                                              //
+  //==========================================================================================================//
+  server.on("/s_mode", HTTP_GET, []() {
+    s_mode_led = server.arg("s_mode[0]").toInt();
+    s_mode_r1  = server.arg("s_mode[1]").toInt();
+    s_mode_r2  = server.arg("s_mode[2]").toInt();
+    Serial.println("SAVE S_MODE: OK");
+    jsonWrite(configSetup, "s_mode", 0, s_mode_led);
+    jsonWrite(configSetup, "s_mode", 1, s_mode_r1);
+    jsonWrite(configSetup, "s_mode", 2, s_mode_r2);
+    saveConfigSetup();
+    server.send(200, "text/plain", "");
+  });
+  //==========================================================================================================//
+  //                                                 SAVE MQTT                                                //
+  //==========================================================================================================//
+  server.on("/mqtt", HTTP_GET, []() {
+    Serial.println("SAVE MQTT: OK");
+    mqtt_server = server.arg("input[2][0]");
+    mqtt_port = server.arg("input[2][1]").toInt();
+    mqtt_ID   = server.arg("input[2][2]");
+    mqtt_user = server.arg("input[2][3]");
+    mqtt_password = server.arg("input[2][4]");
+    mqtt_topic = server.arg("input[2][5]");
+
+    jsonWrite(configSetup, "input", 2, 0, mqtt_server);
+    jsonWrite(configSetup, "input", 2, 1, mqtt_port);
+    jsonWrite(configSetup, "input", 2, 2, mqtt_ID);
+    jsonWrite(configSetup, "input", 2, 3, mqtt_user);
+    jsonWrite(configSetup, "input", 2, 4, mqtt_password);
+    jsonWrite(configSetup, "input", 2, 5, mqtt_topic);
+    saveConfigSetup();
+    server.send(200, "text/plain", "");
+  });
+  //==========================================================================================================//
+  //                                                 RESTART ESP                                              //
+  //==========================================================================================================//
   server.on("/restart", HTTP_POST, []() {
-    Serial.println("RESTART ESP8266. WAIT"); 
+    Serial.println("RESTART ESP8266. WAIT");
     String restart = server.arg("device");
     if (restart == "1") {
       server.send(200, "text/plain", "");
@@ -245,10 +282,10 @@ bool handleFileRead(String path) {
   if (path.endsWith("/")) path += "index.htm";
   String contentType = getContentType(path);
   String pathWithGz = path + ".gz";
-  if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
-    if (SPIFFS.exists(pathWithGz))
+  if (LittleFS.exists(pathWithGz) || LittleFS.exists(path)) {
+    if (LittleFS.exists(pathWithGz))
       path += ".gz";
-    File file = SPIFFS.open(path, "r");
+    File file = LittleFS.open(path, "r");
     size_t sent = server.streamFile(file, contentType);
     file.close();
     return true;
@@ -266,7 +303,7 @@ void handleFileUpload() {
     if (!filename.startsWith("/")) {
       filename = "/" + filename;
     }
-    fsUploadFile = SPIFFS.open(filename, "w");
+    fsUploadFile = LittleFS.open(filename, "w");
     filename = String();
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (fsUploadFile) {
@@ -287,10 +324,10 @@ void handleFileDelete() {
   if (path == "/") {
     return server.send(500, "text/plain", "BAD PATH");
   }
-  if (!SPIFFS.exists(path)) {
+  if (!LittleFS.exists(path)) {
     return server.send(404, "text/plain", "FileNotFound");
   }
-  SPIFFS.remove(path);
+  LittleFS.remove(path);
   server.send(200, "text/plain", "");
   path = String();
 }
@@ -303,10 +340,10 @@ void handleFileCreate() {
   if (path == "/") {
     return server.send(500, "text/plain", "BAD PATH");
   }
-  if (SPIFFS.exists(path)) {
+  if (LittleFS.exists(path)) {
     return server.send(500, "text/plain", "FILE EXISTS");
   }
-  File file = SPIFFS.open(path, "w");
+  File file = LittleFS.open(path, "w");
   if (file) {
     file.close();
   }
@@ -323,7 +360,7 @@ void handleFileList() {
     return;
   }
   String path = server.arg("dir");
-  Dir dir = SPIFFS.openDir(path);
+  Dir dir = LittleFS.openDir(path);
   path = String();
 
   String output = "[";

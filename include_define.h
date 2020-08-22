@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WiFiMulti.h>
 #include <ESP8266WebServer.h>
 #include <FS.h>
+#include <LittleFS.h>
 #include <ArduinoJson.h>
 #include <ESP8266HTTPUpdateServer.h>
-#include <SimpleMovingAverage.h>
 #include <WebSocketsServer.h>
 #include <Hash.h>
 #include <PubSubClient.h>
@@ -13,66 +12,79 @@
 #include <LiquidCrystal_I2C.h>
 #include <OneWire.h>
 //================================================================================================================================
-#define SCL           D1  // SCL
-#define SDA           D2  // SDA
-#define ONE_WIRE_BUS  D3  // DS18B20
-#define TENPIN        D5
-#define LEDPIN        D6
-#define FANPIN        D7
-#define RELAY1PIN     D0
-#define RELAY2PIN     D8
-int port = 49201;
-int websocketPort = 81;
+#include <DallasTemperature.h>
+#include <TickerScheduler.h>
 
-//String f_ver = "4.2";
-const char* ver = "2.11c";
+#define SCL           5  //D1 GPIO5   SCL
+#define SDA           4  //D2 GPIO4   SDA
+#define ONE_WIRE_BUS  0  //D3 GPIO0   DS18B20
+#define TENPIN        14 //D5 GPIO14
+#define LEDPIN        12 //D6 GPIO12
+#define FANPIN        15 //D8 GPIO15
+#define RELAY1PIN     16 //D0 GPIO16
+#define RELAY2PIN     13 //D7 GPIO13
+#define maxPWM        1009
+#define websocketPort 81
+
+int Terr = 0;
+int port = 80;
+
+const char* ver = "4.1b";
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
 
 static const char successResponse[] PROGMEM =
-  "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
+  "<META http-equiv=\"refresh\" content=\"10;URL=/\">Update Success! Rebooting...\n";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-
-SimpleMovingAverage avg;
-ESP8266WiFiMulti WiFiMulti;
-
-ESP8266WebServer server(80);
+ESP8266WebServer server(port);
 ESP8266HTTPUpdateServer httpUpdater;
-WiFiClient espClient;
-PubSubClient client(espClient);
-const char* mqtt_server = "broker.mqtt-dashboard.com";
+
+//WiFiClient espClient;
+//PubSubClient mqttClient(espClient);
 
 WebSocketsServer webSocket = WebSocketsServer(websocketPort);
 File fsUploadFile;
-OneWire  ds(ONE_WIRE_BUS);
+TickerScheduler ts(2);
 
-byte tries = 11;
-byte triesCon = 11;
 int CheckDelay = 10;
 int n = 0;
-String _ssid, _password;
-IPAddress ip;
+String _ssid, _password, _ssidAP, _passwordAP;
+IPAddress ip, ip_gw;
+byte tries = 11;
 String configSetup = "{}";
 String configChart = "{}";
-String jsonLive = "{\"temp\":\"--\",\"now\":\"--.--.----    --:--\",\"led\":\"-\",\"fan\":\"-\",\"ten\":\"-\",\"rel1\":\"-\",\"rel2\":\"-\",\"rssi\":\"-\"}";
-
-String clientId = "ESP8266";
-static char send_temp[15];
-float tempC, temp_filtered, values_day, temp_koef, fan_stop, fan_start, ten_start, ten_stop;
+String configLog = "";
+String jsonLive = "{}";
+//String jsonLive = "{\"temp\":\"--\",\"now\":\"-\",\"led\":\"-\",\"bitFlags\":\"-\",\"Terr\":\"-\",\"ws\":\"-\",\"rssi\":\"-\"}";
+float tempC, temp_filtered;
+float temp_koef = 0.0;
+float fan_start = 30.0;
+float fan_stop = 25.0;
+float ten_stop = 22.0;
+float ten_start = 18.0;
 byte relay1_working = 0;
 byte relay2_working = 0;
-byte led_working = 0;
 byte fan_working = 0;
 byte ten_working = 0;
 byte wifi_working = 0;
 byte ws_working = 0;
-
+byte mqtt_working = 0;
+byte bitFlags = 0;
 int led_bright = 0;
-int randomize, rssi;
+byte s_mode_led = 0;
+byte s_mode_r1 = 0;
+byte s_mode_r2 = 0;
+int rssi;
+uint32_t myTimer1, myTimer2, myTimer3;
+int uploadProc = 0;          // загрузка % при обновлении прошивки
+int flag = 1;
+byte triesCon = 21;
+char line1[16], line2[16], line2_1[16], line2_2[16], logWrite[60];
 
-unsigned long previousMillis = 0; // для таймера
-int uploadProc = 0;               // загрузка % при обновлении прошивки
-int flag = 1;             // для записи графика по времени 3-9-15-21
-char line1[16], line2[16], line2_1[16], line2_2[16];        // для вывода инфы на lcd1602
-//floor() — округление вниз
-//ceil() — округление вверх
-//round() — округление в ближайшую сторону
+String mqtt_server = "192.168.0.2";
+int mqtt_port = 1883;
+String mqtt_user = "";
+String mqtt_password = "";
+String mqtt_topic = "";
+String mqtt_ID = "aqua";
