@@ -14,7 +14,7 @@ Functions implemented in this project:
 12. Added 2 languages (rus, eng). To add new languages, you must specify the abbreviated name of the language in the lang clause in the configSetup.json file. Next, use a file with the language rus.json or eng.json as a template, register your text and save it as the language name specified in lang
 13. The process of creating MQTT is ongoing.
 
-At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 1 second. Ability to select a port for access to a web page. The websocket port is 81.
+At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 0,5 second. Ability to select a port for access to a web page. The websocket port is 81.
 
 The libraries used in the sketch are in the libraries.zip archive.
 
@@ -34,7 +34,7 @@ The libraries used in the sketch are in the libraries.zip archive.
 12. Добавлены 2 языка(rus,eng). Для добавления новых языков необходимо прописать сокращенное название языка в пункте lang в файле configSetup.json. Далее использовать как шаблон файл с языком rus.json или eng.json, прописать свой текст и сохранить как название языка, указанное в lang
 13. Идет процесс создания MQTT.
 
-При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Текущее состояние реле, дата и температура передаются посредством Websocket с частотой в 1 сек. Возможность выбора порта для доступа на веб страницу. Порт websocket - 81.
+При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Текущее состояние реле, дата и температура передаются посредством Websocket с частотой в 0,5 сек. Возможность выбора порта для доступа на веб страницу. Порт websocket - 81.
 
 Библиотеки, используемые в скетче, находятся в архиве libraries.zip.
 
