@@ -61,17 +61,17 @@ void measure_datetime() {
   sensors.requestTemperatures();
   tempC = sensors.getTempCByIndex(0);
   temp_filtered = round(tempC * 10) / 10.0;
-  if (temp_filtered != -127.0 || temp_filtered != 85.0) {
-    sprintf(line1, "%02i:%02i %s %2.1f\2C",  ds_hour, ds_min, daysOfTheWeek[nedelya], temp_filtered);
-    temp_fan_regulation(temp_filtered);
-    temp_ten_regulation(temp_filtered);
-  } else {
+  if (tempC == -127.0 || tempC == 85.0) {
     sprintf(line1, "%02i:%02i %s --ERR--", ds_hour, ds_min, daysOfTheWeek[nedelya]);
     Terr++;
     sprintf(logWrite, "[%s] temp:%2.1fC | led_bright:%i\n", dt_now.c_str(), temp_filtered, led_bright);
     Serial.printf("[%s] temp:%2.1fC | led_bright:%i\n", dt_now.c_str(), temp_filtered, led_bright);
     configLog = logWrite;
     saveLog();
+  } else {
+    sprintf(line1, "%02i:%02i %s %2.1f\2C",  ds_hour, ds_min, daysOfTheWeek[nedelya], temp_filtered);
+    temp_fan_regulation(temp_filtered);
+    temp_ten_regulation(temp_filtered);
   }
   sprintf(line2_1, "\1%i", rssi);
   sprintf(line2_2, "\3%i", led_bright);
