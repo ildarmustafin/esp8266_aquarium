@@ -75,8 +75,6 @@ void measure_datetime() {
   sprintf(line2_2, "\3%i", led_bright);
   printLCD(2, 0, 0, convertValue(line1, 16), convertValue(line2_1, 5), 0);
   printLCD(1, 0, 6, "", convertValue(line2_2, 4), 0);
-  Serial.printf("tempC:%2.1f | temp_filt:%2.1f | FAN:%i | TEN:%i\n", tempC, temp_filtered, fan_working, ten_working);
-
   temp_fan_regulation(temp_filtered);
   temp_ten_regulation(temp_filtered);
   led_schedule();
