@@ -30,22 +30,20 @@ void check_connection() {
 }
 
 void measure_datetime() {
+  int lcd_hour, lcd_min;
   if (Terr >= 1000) Terr = 0;
   rssi =  WiFi.RSSI();
   DateTime now = rtc.now();
   isRTCconnected = now.isValid();
   bitWrite(bitFlags, 6, isRTCconnected);
   if (isRTCconnected == 0) {
-    Terr++;
-    sprintf(logWrite, "[--DATE ERROR--] temp:%2.1fC\n", temp_filtered);
-    Serial.printf("[--DATE ERROR--] temp:%2.1fC\n", temp_filtered);
-    configLog = logWrite;
-    saveLog();
-    ds_hour = 0;
-    ds_min = 0;
-    led_bright = 0;
-    relay1_working = 0;
-    relay2_working = 0;
+    //Terr++;
+    //sprintf(logWrite, "[--DATE ERROR--] temp:%2.1fC | led_bright:%i | LED_value:%i | REL1:%i | REL2:%i\n", tempC, led_bright, LED_value, relay1_working, relay2_working);
+    //Serial.printf("[--DATE ERROR--] temp:%2.1fC | led_bright:%i | LED_value:%i | REL1:%i | REL2:%i\n", tempC, led_bright, LED_value, relay1_working, relay2_working);
+    //configLog = logWrite;
+    //saveLog();
+    lcd_hour = 0;
+    lcd_min = 0;
   } else {
     dt_now = now.timestamp();
     ds_day = now.day();
@@ -55,28 +53,34 @@ void measure_datetime() {
     ds_min = now.minute();
     ds_sec = now.second();
     nedelya = dotw[now.dayOfTheWeek()].toInt();
-    led_schedule();
-    relay_schedule();
+    lcd_hour = ds_hour;
+    lcd_min = ds_min;
   }
   sensors.requestTemperatures();
   tempC = sensors.getTempCByIndex(0);
-  temp_filtered = round(tempC * 10) / 10.0;
   if (tempC == -127.0 || tempC == 85.0) {
-    sprintf(line1, "%02i:%02i %s --ERR--", ds_hour, ds_min, daysOfTheWeek[nedelya]);
-    Terr++;
-    sprintf(logWrite, "[%s] temp:%2.1fC | led_bright:%i\n", dt_now.c_str(), temp_filtered, led_bright);
-    Serial.printf("[%s] temp:%2.1fC | led_bright:%i\n", dt_now.c_str(), temp_filtered, led_bright);
-    configLog = logWrite;
-    saveLog();
+    sprintf(line1, "%02i:%02i %s --ERR--", lcd_hour, lcd_min, daysOfTheWeek[nedelya]);
+    //Terr++;
+    //sprintf(logWrite, "[%s] temp:%2.1fC | led_bright:%i | LED_value:%i | FAN:%i | TEN:%i\n", dt_now.c_str(), tempC, led_bright, LED_value, fan_working, ten_working);
+    //Serial.printf("[%s] temp:%2.1fC | led_bright:%i | LED_value:%i | FAN:%i | TEN:%i\n", dt_now.c_str(), tempC, led_bright, LED_value, fan_working, ten_working);
+    //configLog = logWrite;
+    //saveLog();
   } else {
-    sprintf(line1, "%02i:%02i %s %2.1f\2C",  ds_hour, ds_min, daysOfTheWeek[nedelya], temp_filtered);
-    temp_fan_regulation(temp_filtered);
-    temp_ten_regulation(temp_filtered);
+    temp_filtered = round(tempC * 10) / 10.0;
+    sprintf(line1, "%02i:%02i %s %2.1f\2C",  lcd_hour, lcd_min, daysOfTheWeek[nedelya], temp_filtered);
   }
   sprintf(line2_1, "\1%i", rssi);
+  //sprintf(line2_1, "%i", Terr);
+
   sprintf(line2_2, "\3%i", led_bright);
   printLCD(2, 0, 0, convertValue(line1, 16), convertValue(line2_1, 5), 0);
   printLCD(1, 0, 6, "", convertValue(line2_2, 4), 0);
+  Serial.printf("tempC:%2.1f | temp_filt:%2.1f | FAN:%i | TEN:%i\n", tempC, temp_filtered, fan_working, ten_working);
+
+  temp_fan_regulation(temp_filtered);
+  temp_ten_regulation(temp_filtered);
+  led_schedule();
+  relay_schedule();
 
   updateZnak(4, fan_working,    13, 1);
   updateZnak(5, ten_working,    14, 1);
@@ -181,11 +185,11 @@ void relay_schedule() {
     sscanf(schedule[1][nedelya][1].c_str(), "%d:%d", &hour_1[nedelya], &min_1[nedelya]);
     sscanf(schedule[1][nedelya][2].c_str(), "%d:%d", &hour_2[nedelya], &min_2[nedelya]);
     sscanf(schedule[1][nedelya][3].c_str(), "%d:%d", &hour_3[nedelya], &min_3[nedelya]);
-    sec_0 = hour_0[nedelya] * 60 * 60 + min_0[nedelya] * 60;
-    sec_1 = hour_1[nedelya] * 60 * 60 + min_1[nedelya] * 60;
-    sec_2 = hour_2[nedelya] * 60 * 60 + min_2[nedelya] * 60;
-    sec_3 = hour_3[nedelya] * 60 * 60 + min_3[nedelya] * 60;
-    sec_now  = ds_hour * 60 * 60 + ds_min * 60 + ds_sec;
+    sec_0 = hour_0[nedelya] * 3600 + min_0[nedelya] * 60;
+    sec_1 = hour_1[nedelya] * 3600 + min_1[nedelya] * 60;
+    sec_2 = hour_2[nedelya] * 3600 + min_2[nedelya] * 60;
+    sec_3 = hour_3[nedelya] * 3600 + min_3[nedelya] * 60;
+    sec_now  = ds_hour * 3600 + ds_min * 60 + ds_sec;
     switch (s_mode_r1) {
       case 0:
         if (sec_now < sec_0 || sec_now > sec_1) {
