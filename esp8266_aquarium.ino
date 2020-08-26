@@ -5,6 +5,7 @@
 //                                                 INITIAL SETUP                                            //
 //==========================================================================================================//
 void setup() {
+  analogWriteFreq(100);  //new_frequency = 100..40000Hz     
   pinMode(LEDPIN, OUTPUT);
   pinMode(FANPIN, OUTPUT);
   pinMode(TENPIN, OUTPUT);
