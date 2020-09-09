@@ -1,3 +1,5 @@
+Last version in Releases
+
 Functions implemented in this project:
 
 1. Indicates temperature on the display(LCD1602) and the web interface.
@@ -17,6 +19,8 @@ Functions implemented in this project:
 At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 0,5 second. Ability to select a port for access to a web page. The websocket port is 81.
 
 The libraries used in the sketch are in the libraries.zip archive.
+
+Последняя версия находится в разделе Releases
 
 Функции, реализованные в данном проекте:
 
