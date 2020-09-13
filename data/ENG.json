@@ -7,7 +7,7 @@
 ["Day quantity [2..28]:","min:","max:","aver:"], 
 ["MO:","TU:","WE:","TH:","FR:","SA:","SU:","Led:","Relay №1:","Relay №2:"], 
 ["Temperature correction:", "Max bright:", "Min bright:", "Fan on:", "Fan off:", "Heater off:", "Heater on:"], 
-["mqtt_server:","mqtt_port:","mqtt_ID:","mqtt_user:","mqtt_password:","mqtt_topic:"],
+["mqtt_server*:","mqtt_port*:","mqtt_ID*:","mqtt_user:","mqtt_password:","mqtt_topic*:"],
 ["Date:", "Time:", "Timezone [GMT+]:", "NTP-Server:", "AP name:", "Connect to WIFI:", "IP-address / Gateway", "Port:", "Reconnect [sec]:", "Firmware update:", "Restart controller ESP8266:"] 
 ],
 "popup":["Restart ESP8266-12E?", "Reboot is required"],
