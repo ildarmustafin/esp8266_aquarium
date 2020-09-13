@@ -6,7 +6,6 @@ void send_values_by_websocket() {
   jsonWrite(jsonLive, "bitFlags", bitFlags);
   jsonWrite(jsonLive, "Terr", Terr);
   jsonWrite(jsonLive, "ws", ws_working);
-  //  if (mqttClient.connected()) mqttClient.publish(mqtt_topic.c_str(), jsonLive.c_str());
   if (ws_working != 0) webSocket.broadcastTXT(jsonLive);
 }
 
@@ -14,12 +13,13 @@ void send_values_by_websocket() {
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
   switch (type) {
     case WStype_DISCONNECTED:
-      Serial.printf("Websocket-соединение с [%u] разорвано!\n", num);
+      Serial.printf("Websocket-соединение с %s разорвано!\n", wsIP[num].c_str());
       if (ws_working != 0) ws_working--;
       break;
     case WStype_CONNECTED:
+      wsIP[num] = webSocket.remoteIP(num).toString();
       ws_working++;
-      Serial.printf("Установлено Websocket-соединение с [%u]!\n", num);
+      Serial.printf("Установлено Websocket-соединение с %s!\n", wsIP[num].c_str());
       break;
   }
 }

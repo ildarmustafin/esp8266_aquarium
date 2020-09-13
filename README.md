@@ -20,6 +20,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 
 The libraries used in the sketch are in the libraries.zip archive.
 
+
 Последняя версия находится в разделе Releases
 
 Функции, реализованные в данном проекте:
