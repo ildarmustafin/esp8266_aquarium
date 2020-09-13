@@ -33,8 +33,10 @@ void FS_init(void) {
   //                                                 WIFI                                                     //
   //==========================================================================================================//
   server.on("/ssid", HTTP_POST, []() {
-    ip.fromString(server.arg("input[3][8]").c_str());
-    ip_gw.fromString(server.arg("input[3][9]").c_str());
+    ip_str = server.arg("input[3][8]").c_str();
+    ip.fromString(ip_str);
+    ip_gw_str = server.arg("input[3][9]").c_str();
+    ip_gw.fromString(ip_gw_str);
     port       = server.arg("input[3][10]").toInt();
     CheckDelay = server.arg("input[3][11]").toInt();
     n = CheckDelay;
@@ -42,8 +44,8 @@ void FS_init(void) {
     jsonWrite(configSetup, "input", 3, 5, String(server.arg("input[3][5]")));  //ssidAP_PASS
     jsonWrite(configSetup, "input", 3, 6, String(server.arg("input[3][6]")));  //ssid
     jsonWrite(configSetup, "input", 3, 7, String(server.arg("input[3][7]")));  //ssid_PASS
-    jsonWrite(configSetup, "input", 3, 8, ip.toString());                      //ip
-    jsonWrite(configSetup, "input", 3, 9, ip_gw.toString());                   //ip_gateway
+    jsonWrite(configSetup, "input", 3, 8, ip_str);                             //ip
+    jsonWrite(configSetup, "input", 3, 9, ip_gw_str);                          //ip_gateway
     jsonWrite(configSetup, "input", 3, 10, port);                              //web_port
     jsonWrite(configSetup, "input", 3, 11, CheckDelay);
     saveConfigSetup();
@@ -53,7 +55,8 @@ void FS_init(void) {
   //                                                 DEFAULT LANG SAVE                                        //
   //==========================================================================================================//
   server.on("/lang", HTTP_GET, []() {
-    jsonWrite(configSetup, "defaultLang", String(server.arg("defaultLang")));
+    defLang = server.arg("defaultLang");
+    jsonWrite(configSetup, "defaultLang", defLang);
     saveConfigSetup();
     server.send(200, "text/plain", "");
   });
@@ -227,13 +230,22 @@ void FS_init(void) {
   //==========================================================================================================//
   server.on("/mqtt", HTTP_GET, []() {
     Serial.println("SAVE MQTT: OK");
-    mqtt_server = server.arg("input[2][0]");
+    mqttClient.disconnect();
+    mqtt_server = server.arg("input[2][0]").c_str();
     mqtt_port = server.arg("input[2][1]").toInt();
     mqtt_ID   = server.arg("input[2][2]");
     mqtt_user = server.arg("input[2][3]");
     mqtt_password = server.arg("input[2][4]");
     mqtt_topic = server.arg("input[2][5]");
-
+    if (mqtt_server == "" && mqtt_ID == "" && mqtt_port == 0) {
+      ts.disable(2);
+      Serial.printf("MQTT-соединение разорвано!\n");
+      mqtt_working = 0;
+    } else {
+      mqttClient.setServer(mqtt_server.c_str(), mqtt_port);
+      mqttClient.connect(mqtt_ID.c_str(), mqtt_user.c_str(), mqtt_password.c_str());
+      ts.enable(2);
+    }
     jsonWrite(configSetup, "input", 2, 0, mqtt_server);
     jsonWrite(configSetup, "input", 2, 1, mqtt_port);
     jsonWrite(configSetup, "input", 2, 2, mqtt_ID);

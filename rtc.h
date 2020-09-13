@@ -3,7 +3,8 @@
 #include "RTClib.h"
 
 RTC_DS3231 rtc;
-char daysOfTheWeek[7][3] = {"MO", "TU", "WE", "TH", "FR", "SA", "SU"};
+char daysOfTheWeekENG[7][3] = {"MO", "TU", "WE", "TH", "FR", "SA", "SU"};
+char daysOfTheWeekRUS[7][3] = {"\7H", "BT", "CP", "\7T", "\7T", "C\7", "BC"};
 String dotw[7] = {"6", "0", "1", "2", "3", "4", "5"};
 WiFiUDP udp;
 int LED_value = 0;

@@ -31,7 +31,7 @@ void check_connection() {
 
 void measure_datetime() {
   int lcd_hour, lcd_min;
-  if (Terr >= 1000) Terr = 0;
+  //  if (Terr >= 1000) Terr = 0;
   rssi =  WiFi.RSSI();
   DateTime now = rtc.now();
   isRTCconnected = now.isValid();
@@ -53,13 +53,32 @@ void measure_datetime() {
     ds_min = now.minute();
     ds_sec = now.second();
     nedelya = dotw[now.dayOfTheWeek()].toInt();
+    switch (nedelya) {
+      case 0:
+        lcd.createChar(7, znak_P);
+        break;
+      case 3:
+        lcd.createChar(7, znak_Ch);
+        break;
+      case 4:
+        lcd.createChar(7, znak_P);
+        break;
+      case 5:
+        lcd.createChar(7, znak_B);
+        break;
+    }
     lcd_hour = ds_hour;
     lcd_min = ds_min;
   }
   sensors.requestTemperatures();
   tempC = sensors.getTempCByIndex(0);
   if (tempC == -127.0 || tempC == 85.0) {
-    sprintf(line1, "%02i:%02i %s --ERR--", lcd_hour, lcd_min, daysOfTheWeek[nedelya]);
+
+    if (defLang == "RUS") {
+      sprintf(line1, "%02i:%02i %s --ERR--", lcd_hour, lcd_min, daysOfTheWeekRUS[nedelya]);
+    } else {
+      sprintf(line1, "%02i:%02i %s --ERR--", lcd_hour, lcd_min, daysOfTheWeekENG[nedelya]);
+    }
     //Terr++;
     //sprintf(logWrite, "[%s] temp:%2.1fC | led_bright:%i | LED_value:%i | FAN:%i | TEN:%i\n", dt_now.c_str(), tempC, led_bright, LED_value, fan_working, ten_working);
     //Serial.printf("[%s] temp:%2.1fC | led_bright:%i | LED_value:%i | FAN:%i | TEN:%i\n", dt_now.c_str(), tempC, led_bright, LED_value, fan_working, ten_working);
@@ -67,11 +86,13 @@ void measure_datetime() {
     //saveLog();
   } else {
     temp_filtered = round(tempC * 10) / 10.0;
-    sprintf(line1, "%02i:%02i %s %2.1f\2C",  lcd_hour, lcd_min, daysOfTheWeek[nedelya], temp_filtered);
+    if (defLang == "RUS") {
+      sprintf(line1, "%02i:%02i %s %2.1f\2C",  lcd_hour, lcd_min, daysOfTheWeekRUS[nedelya], temp_filtered);
+    } else {
+      sprintf(line1, "%02i:%02i %s %2.1f\2C",  lcd_hour, lcd_min, daysOfTheWeekENG[nedelya], temp_filtered);
+    }
   }
   sprintf(line2_1, "\1%i", rssi);
-  //sprintf(line2_1, "%i", Terr);
-
   sprintf(line2_2, "\3%i", led_bright);
   printLCD(2, 0, 0, convertValue(line1, 16), convertValue(line2_1, 5), 0);
   printLCD(1, 0, 6, "", convertValue(line2_2, 4), 0);
@@ -83,8 +104,9 @@ void measure_datetime() {
   updateZnak(4, fan_working,    13, 1);
   updateZnak(5, ten_working,    14, 1);
   updateZnak(6, ws_working,     15, 1);
-  updateZnak(7, relay1_working, 11, 1);
-  updateZnak(8, relay2_working, 12, 1);
+  updateZnak("1", relay1_working, 11, 1);
+  updateZnak("2", relay2_working, 12, 1);
+
   bitWrite(bitFlags, 1, mqtt_working);
   bitWrite(bitFlags, 2, relay2_working);
   bitWrite(bitFlags, 3, relay1_working);
@@ -97,8 +119,8 @@ void readJsonValues() {
   jsonWrite(configSetup, "ver", ver);
   saveConfigSetup();
   temp_koef = jsonReadToFloat(configSetup, "input", 1, 0);
-  max_day_percent   = jsonReadToInt(configSetup,   "input", 1, 1);
-  max_night_percent = jsonReadToInt(configSetup,   "input", 1, 2);
+  max_day_percent   = jsonReadToInt(configSetup, "input", 1, 1);
+  max_night_percent = jsonReadToInt(configSetup, "input", 1, 2);
   fan_start = jsonReadToFloat(configSetup, "input", 1, 3);
   fan_stop  = jsonReadToFloat(configSetup, "input", 1, 4);
   ten_stop  = jsonReadToFloat(configSetup, "input", 1, 5);
@@ -109,19 +131,20 @@ void readJsonValues() {
   mqtt_user     = jsonReadToStr(configSetup, "input", 2, 3);
   mqtt_password = jsonReadToStr(configSetup, "input", 2, 4);
   mqtt_topic    = jsonReadToStr(configSetup, "input", 2, 5);
-
   timeZone      = jsonReadToInt(configSetup, "input", 3, 2);
   ntpServerName = jsonReadToStr(configSetup, "input", 3, 3).c_str();
   _ssidAP       = jsonReadToStr(configSetup, "input", 3, 4);
   _passwordAP   = jsonReadToStr(configSetup, "input", 3, 5);
   _ssid         = jsonReadToStr(configSetup, "input", 3, 6);
   _password     = jsonReadToStr(configSetup, "input", 3, 7);
-  ip.fromString(jsonReadToStr(configSetup,   "input", 3, 8).c_str());
-  ip_gw.fromString(jsonReadToStr(configSetup, "input", 3, 9).c_str());
+  ip_str = jsonReadToStr(configSetup, "input", 3, 8).c_str();
+  ip.fromString(ip_str);
+  ip_gw_str = jsonReadToStr(configSetup, "input", 3, 9).c_str();
+  ip_gw.fromString(ip_gw_str);
   port          = jsonReadToInt(configSetup, "input", 3, 10);
   CheckDelay    = jsonReadToInt(configSetup, "input", 3, 11);
   n = CheckDelay;
-
+  defLang = jsonReadToStr(configSetup, "defaultLang");
   s_mode_led = jsonReadToInt(configSetup, "s_mode", 0);
   s_mode_r1  = jsonReadToInt(configSetup, "s_mode", 1);
   s_mode_r2  = jsonReadToInt(configSetup, "s_mode", 2);
@@ -167,11 +190,11 @@ void led_schedule() {
         break;
       case 1:
         led_bright = 100;
-        digitalWrite(LEDPIN, HIGH);
+        analogWrite(LEDPIN, 1023);
         break;
       case 2:
         led_bright = 0;
-        digitalWrite(LEDPIN, LOW);
+        analogWrite(LEDPIN, 0);
         break;
     }
   }

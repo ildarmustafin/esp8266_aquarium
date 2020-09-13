@@ -33,8 +33,8 @@ void updateZnak(byte printB, bool value, byte col, byte row) {
     lcd.print(" ");
   }
 }
-/*
-  void updateZnak(String printB, bool value, byte col, byte row) {
+
+void updateZnak(String printB, bool value, byte col, byte row) {
   if (value) {
     lcd.setCursor(col, row);
     lcd.print(printB);
@@ -42,8 +42,8 @@ void updateZnak(byte printB, bool value, byte col, byte row) {
     lcd.setCursor(col, row);
     lcd.print(" ");
   }
-  }
-*/
+}
+
 void initLCD() {
   lcd.begin();
   lcd.backlight();
@@ -52,8 +52,6 @@ void initLCD() {
   lcd.createChar(4, znak_fan);
   lcd.createChar(5, znak_ten);
   lcd.createChar(6, znak_ws);
-  lcd.createChar(7, znak_rel1);
-  lcd.createChar(8, znak_rel2);
 }
 //==========================================================================================================
 //                                                 ZNAKI LCD FOR UPDATE

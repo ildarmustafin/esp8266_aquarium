@@ -5,7 +5,10 @@
 //                                                 INITIAL SETUP                                            //
 //==========================================================================================================//
 void setup() {
-  analogWriteFreq(100);  //new_frequency = 100..40000Hz     
+  //analogWriteFreq(new_frequency);  // new_frequency = 100..40000Hz
+  //analogWriteRange(new_range);     // new_range     = 15...65535
+  //analogWriteResolution(bits);     // bits          = 4...16
+  analogWriteFreq(100);  //new_frequency = 100..40000Hz
   pinMode(LEDPIN, OUTPUT);
   pinMode(FANPIN, OUTPUT);
   pinMode(TENPIN, OUTPUT);
@@ -50,7 +53,6 @@ void setup() {
   rtc.begin();
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-
   ts.add(0, 1000, [&](void *) {
     check_connection();
     measure_datetime();
@@ -58,7 +60,17 @@ void setup() {
   ts.add(1, 500, [&](void *) {
     send_values_by_websocket();
   }, nullptr, true);
+  ts.add(2, 1000, [&](void *) {
+    send_values_by_mqtt();
+  }, nullptr, true);
 
+  if (mqtt_server != "" && mqtt_ID != "" && mqtt_port != 0) {
+    mqttClient.setServer(mqtt_server.c_str(), mqtt_port);
+    mqttClient.connect(mqtt_ID.c_str(), mqtt_user.c_str(), mqtt_password.c_str());
+    //mqttClient.setCallback(callback);
+  } else {
+    ts.disable(2);
+  }
 }
 //==========================================================================================================//
 //                                                 LOOP                                                     //
@@ -67,5 +79,8 @@ void loop() {
   ts.update();
   server.handleClient();
   webSocket.loop();
+  if (mqttClient.connected()) {
+    mqttClient.loop();
+  }
   yield();
 }

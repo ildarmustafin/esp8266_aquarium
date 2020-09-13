@@ -20,16 +20,16 @@
 #define ONE_WIRE_BUS  0  //D3 GPIO0   DS18B20
 #define TENPIN        14 //D5 GPIO14
 #define LEDPIN        12 //D6 GPIO12
-#define FANPIN        15 //D8 GPIO15
+#define FANPIN        15 //D8 GPIO15   
+
 #define RELAY1PIN     16 //D0 GPIO16
 #define RELAY2PIN     13 //D7 GPIO13
-#define maxPWM        1009
+#define maxPWM        1023
 #define websocketPort 81
-
 int Terr = 0;
 int port = 80;
 
-const char* ver = "4.1b";
+const char* ver = "4.3a";
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
@@ -40,23 +40,25 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 ESP8266WebServer server(port);
 ESP8266HTTPUpdateServer httpUpdater;
 
-//WiFiClient espClient;
-//PubSubClient mqttClient(espClient);
+WiFiClient espClient;
+PubSubClient mqttClient(espClient);
 
 WebSocketsServer webSocket = WebSocketsServer(websocketPort);
 File fsUploadFile;
-TickerScheduler ts(2);
+TickerScheduler ts(3);
 
 int CheckDelay = 10;
 int n = 0;
+int mqttcount = 0;
 String _ssid, _password, _ssidAP, _passwordAP;
-IPAddress ip, ip_gw;
+IPAddress ip, ip_gw, ipRem;
+String ip_str, ip_gw_str;
+String wsIP[5] = {"", "", "", "", ""};
 byte tries = 11;
 String configSetup = "{}";
 String configChart = "{}";
 String configLog = "";
 String jsonLive = "{}";
-//String jsonLive = "{\"temp\":\"--\",\"now\":\"-\",\"led\":\"-\",\"bitFlags\":\"-\",\"Terr\":\"-\",\"ws\":\"-\",\"rssi\":\"-\"}";
 float tempC, temp_filtered;
 float temp_koef = 0.0;
 float fan_start = 30.0;
@@ -81,10 +83,7 @@ int uploadProc = 0;          // загрузка % при обновлении �
 int flag = 1;
 byte triesCon = 21;
 char line1[16], line2[16], line2_1[16], line2_2[16], logWrite[60];
-
-String mqtt_server = "192.168.0.2";
-int mqtt_port = 1883;
-String mqtt_user = "";
-String mqtt_password = "";
-String mqtt_topic = "";
-String mqtt_ID = "aqua";
+String defLang;
+String mqtt_server, mqtt_user, mqtt_password, mqtt_topic, mqtt_ID;
+int mqtt_port;
+byte mqttFlag = 0;
