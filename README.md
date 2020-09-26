@@ -42,18 +42,18 @@ The libraries used in the sketch are in the libraries.zip archive.
 
 Библиотеки, используемые в скетче, находятся в архиве libraries.zip.
 
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.jpg)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.jpg)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
 
 [release_svg]:   https://img.shields.io/badge/release-4.3a-blue.svg
 [release_path]:  https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
-[forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-green.svg
+[forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-red.svg
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
 [stars_svg]:     https://img.shields.io/github/stars/ildarmustafin/esp8266_aquarium.svg
 [stars_path]:    https://github.com/ildarmustafin/esp8266_aquarium/stargazers
