@@ -49,6 +49,7 @@ The libraries used in the sketch are in the libraries.zip archive.
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
 
 [license]:       https://choosealicense.com/licenses/gpl-3.0/
 [release_svg]:   https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/release.svg
