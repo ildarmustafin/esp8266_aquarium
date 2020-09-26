@@ -1,4 +1,5 @@
-Last version in Releases
+[![Release](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/release.svg)](https://github.com/ildarmustafin/esp8266_aquarium/releases/latest) 
+[![forum](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/forum.svg)](https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637) 
 
 Functions implemented in this project:
 
@@ -21,8 +22,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 The libraries used in the sketch are in the libraries.zip archive.
 
 
-Последняя версия находится в разделе Releases
-
+*****************************************************************************************************************************************************************************
 Функции, реализованные в данном проекте:
 
 1. Вывод показаний температуры на дисплей(LCD1602) и веб интерфейс.
@@ -43,10 +43,10 @@ The libraries used in the sketch are in the libraries.zip archive.
 
 Библиотеки, используемые в скетче, находятся в архиве libraries.zip.
 
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.JPG)
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.JPG)
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
-![Иллюстрация к проекту](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
