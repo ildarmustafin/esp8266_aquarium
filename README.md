@@ -49,8 +49,8 @@ The libraries used in the sketch are in the libraries.zip archive.
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_9.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_10.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
 
 [release_svg]:   https://img.shields.io/badge/release-4.3a-blue.svg
