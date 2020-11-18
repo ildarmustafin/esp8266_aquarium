@@ -44,14 +44,14 @@ The libraries used in the sketch are in the libraries.zip archive.
 
 Библиотеки, используемые в скетче, находятся в архиве libraries.zip.
 
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_9.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_10.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_1.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_2.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_3.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_4.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_5.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_6.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/mini_8.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/v5.1a/photo/%D0%9D%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B8%20%D0%B4%D0%BB%D1%8F%20%201Mb.JPG)
 
 [release_svg]:   https://img.shields.io/badge/release-5.1a-blue.svg
 [release_path]:  https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
