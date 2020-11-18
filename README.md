@@ -1,4 +1,4 @@
-[![release_svg][]][release_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![count_svg][]][count_path] [![issues_svg][]][issues_path]
+[![release_svg][]][release_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![issues_svg][]][issues_path]
 
 Functions implemented in this project:
 
@@ -15,9 +15,9 @@ Functions implemented in this project:
 11. FSBrowser - to access files of the file system. Access through 192.168.x.x / edit
 12. Added 2 languages (rus, eng). To add new languages, you must specify the abbreviated name of the language in the lang clause in the configSetup.json file. Next, use a file with the language rus.json or eng.json as a template, register your text and save it as the language name specified in lang
 13. Send JSON by MQTT. Data is not sending on empty options.
-14. You can set static IP on options. IP dynami, if options is empty.
+14. You can set static IP on options. IP dynamic, if options is empty.
 
-At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 0,5 second. Ability to select a port for access to a web page. The websocket port is 81.
+At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 0,5 second. Ability to select a port for access to a web page. The websocket port is /ws.
 
 The libraries used in the sketch are in the libraries.zip archive.
 
@@ -40,7 +40,7 @@ The libraries used in the sketch are in the libraries.zip archive.
 13. Передача JSON по MQTT. При пустых строках в настройке, передача данных не осуществляется.
 14. Возможно установить статический IP. IP динамический, при пустых строках в настройках.
 
-При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Текущее состояние реле, дата и температура передаются посредством Websocket с частотой в 0,5 сек. Возможность выбора порта для доступа на веб страницу. Порт websocket - 81.
+При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Текущее состояние реле, дата и температура передаются посредством Websocket с частотой в 0,5 сек. Возможность выбора порта для доступа на веб страницу. Порт websocket - /ws.
 
 Библиотеки, используемые в скетче, находятся в архиве libraries.zip.
 
@@ -49,9 +49,11 @@ The libraries used in the sketch are in the libraries.zip archive.
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_9.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_10.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/options_1Mb.JPG)
+
 
 [release_svg]:   https://img.shields.io/badge/release-4.3a-blue.svg
 [release_path]:  https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
@@ -59,7 +61,5 @@ The libraries used in the sketch are in the libraries.zip archive.
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
 [stars_svg]:     https://img.shields.io/github/stars/ildarmustafin/esp8266_aquarium.svg
 [stars_path]:    https://github.com/ildarmustafin/esp8266_aquarium/stargazers
-[count_svg]:     http://hits.dwyl.io/ildarmustafin/esp8266_aquarium/badges.svg
-[count_path]:    http://hits.dwyl.io/ildarmustafin/esp8266_aquarium/badges
 [issues_svg]:    https://img.shields.io/github/issues/ildarmustafin/esp8266_aquarium.svg
 [issues_path]:   https://github.com/ildarmustafin/esp8266_aquarium/issues/
