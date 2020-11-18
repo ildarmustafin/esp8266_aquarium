@@ -1,4 +1,4 @@
-[![release_svg][]][release_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![count_svg][]][count_path] [![issues_svg][]][issues_path]
+[![release_svg][]][release_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![issues_svg][]][issues_path]
 
 Functions implemented in this project:
 
@@ -59,7 +59,5 @@ The libraries used in the sketch are in the libraries.zip archive.
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
 [stars_svg]:     https://img.shields.io/github/stars/ildarmustafin/esp8266_aquarium.svg
 [stars_path]:    https://github.com/ildarmustafin/esp8266_aquarium/stargazers
-[count_svg]:     http://hits.dwyl.io/ildarmustafin/esp8266_aquarium/badges.svg
-[count_path]:    http://hits.dwyl.io/ildarmustafin/esp8266_aquarium/badges
 [issues_svg]:    https://img.shields.io/github/issues/ildarmustafin/esp8266_aquarium.svg
 [issues_path]:   https://github.com/ildarmustafin/esp8266_aquarium/issues/
