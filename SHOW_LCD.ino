@@ -1,29 +1,18 @@
-char* convertValue(char* curValue, byte maxLengthValue) {
-  const char* probel[5] = {"", " ", "  ", "   ", "    "};
-  char result[256];
-  sprintf(result, "%s%s",  curValue, probel[maxLengthValue - strlen(curValue)]);
-  return result;
-}
-
-void printLCD(byte colEmpty, byte c0, byte c1, String line1, String line2, int zaderjka) {
+void printLCD(byte colEmpty, byte col, char* line1, char* line2) {
   switch (colEmpty) {
-    case 0:
-      lcd.setCursor(c0, 0);
-      lcd.print(line1);
-      break;
     case 1:
-      lcd.setCursor(c1, 1);
+      lcd.setCursor(col, 1);
       lcd.print(line2);
       break;
     case 2:
-      lcd.setCursor(c0, 0);
+      lcd.setCursor(0, 0);
       lcd.print(line1);
-      lcd.setCursor(c1, 1);
+      lcd.setCursor(col, 1);
       lcd.print(line2);
       break;
   }
-  delay(zaderjka);
 }
+
 void updateZnak(byte printB, bool value, byte col, byte row) {
   if (value) {
     lcd.setCursor(col, row);
@@ -53,9 +42,7 @@ void initLCD() {
   lcd.createChar(5, znak_ten);
   lcd.createChar(6, znak_ws);
 }
-//==========================================================================================================
-//                                                 ZNAKI LCD FOR UPDATE
-//==========================================================================================================
+
 void initBar2() {
   lcd.createChar(0, left_empty);
   lcd.createChar(1, center_empty);

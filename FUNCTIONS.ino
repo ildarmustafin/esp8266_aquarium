@@ -1,49 +1,24 @@
-void check_connection() {
-  if (triesCon-- && WiFi.status() != WL_CONNECTED && wifi_working)  {
-    Serial.printf("LOST CONNECTION...WAITING FOR: %i\n", triesCon);
-    lcd.createChar(1, znak_wifi_tc);
-    if (!triesCon) {
-      StartAPMode();
-    }
-  } else {
-    lcd.createChar(1, znak_wifi_sta);
-    triesCon = 21;
-  }
-
-  if (CheckDelay-- && !wifi_working) {
-    Serial.printf("RECONNECT AFTER: %i\n", CheckDelay);
-    if (!CheckDelay) {
-      int rt = WiFi.scanNetworks();
-      Serial.println("SCANNING DONE...");
-      for (int i = 0; i < rt; ++i) {
-        if (rt != 0 && WiFi.SSID(i) == _ssid) {
-          Serial.printf("\nFOUND \"%s\"\nCONNECTING...PLEASE WAIT...\n", _ssid.c_str());
-          delay(100);
-          initSTA();
-        }
-      }
-      CheckDelay = n;
-    }
-  } else {
-    CheckDelay = n;
-  }
-}
-
-void measure_datetime() {
-  int lcd_hour, lcd_min;
-  //  if (Terr >= 1000) Terr = 0;
-  rssi =  WiFi.RSSI();
+void readDateTime() {
   DateTime now = rtc.now();
-  isRTCconnected = now.isValid();
-  bitWrite(bitFlags, 6, isRTCconnected);
-  if (isRTCconnected == 0) {
-    //Terr++;
-    //sprintf(logWrite, "[--DATE ERROR--] temp:%2.1fC | led_bright:%i | LED_value:%i | REL1:%i | REL2:%i\n", tempC, led_bright, LED_value, relay1_working, relay2_working);
-    //Serial.printf("[--DATE ERROR--] temp:%2.1fC | led_bright:%i | LED_value:%i | REL1:%i | REL2:%i\n", tempC, led_bright, LED_value, relay1_working, relay2_working);
-    //configLog = logWrite;
-    //saveLog();
-    lcd_hour = 0;
-    lcd_min = 0;
+  nowisValid = now.isValid();
+  if (!nowisValid) {
+    if (nowisValid != old_valid) {  //при изменении ошибки, выводит 1 раз сообщение на ком-порт
+      Serial.printf("[%s]: %2.1fC | LED_value:%i\n", dt_now.c_str(), tempC, LED_value);
+      old_valid = nowisValid;
+    }
+    if (date_error < 10) {
+      date_error++;
+    } else {
+      lcd_hour = 0;
+      lcd_min = 0;
+      dt_now = "";
+      led_bright = 0;
+      relay1_working = 0;
+      relay2_working = 0;
+      analogWrite(LEDPIN, 0);
+      digitalWrite(RELAY1PIN, relay1_working);
+      digitalWrite(RELAY2PIN, relay2_working);
+    }
   } else {
     dt_now = now.timestamp();
     ds_day = now.day();
@@ -67,52 +42,78 @@ void measure_datetime() {
         lcd.createChar(7, znak_B);
         break;
     }
+    bitWrite(bf, 2, relay2_working);
+    bitWrite(bf, 3, relay1_working);
     lcd_hour = ds_hour;
     lcd_min = ds_min;
+    led_schedule();
+    relay_schedule();
+    update_chart_values();
   }
+}
+
+void readTemp() {
+  sensors.setWaitForConversion(false);
   sensors.requestTemperatures();
-  tempC = sensors.getTempCByIndex(0);
-  if (tempC == -127.0 || tempC == 85.0) {
-
-    if (defLang == "RUS") {
-      sprintf(line1, "%02i:%02i %s --ERR--", lcd_hour, lcd_min, daysOfTheWeekRUS[nedelya]);
-    } else {
-      sprintf(line1, "%02i:%02i %s --ERR--", lcd_hour, lcd_min, daysOfTheWeekENG[nedelya]);
+  float t = sensors.getTempCByIndex(0);
+  if (t == -127.0 || t == 85.0) {
+    if (t != old_temp) {
+      Serial.printf("[%s]: Temp:%2.1fC\n", dt_now.c_str(), t);
+      old_temp = t;
     }
-    //Terr++;
-    //sprintf(logWrite, "[%s] temp:%2.1fC | led_bright:%i | LED_value:%i | FAN:%i | TEN:%i\n", dt_now.c_str(), tempC, led_bright, LED_value, fan_working, ten_working);
-    //Serial.printf("[%s] temp:%2.1fC | led_bright:%i | LED_value:%i | FAN:%i | TEN:%i\n", dt_now.c_str(), tempC, led_bright, LED_value, fan_working, ten_working);
-    //configLog = logWrite;
-    //saveLog();
+    if (temp_error < waitForTemp) {
+      temp_error++;
+    } else {
+      tempC = round(t * 10) / 10.0 + temp_koef;
+      sprintf(temp_char, "--.-\2C");
+      fan_working = 0;
+      ten_working = 0;
+      digitalWrite(FANPIN, fan_working);
+      digitalWrite(TENPIN, ten_working);
+    }
   } else {
-    temp_filtered = round(tempC * 10) / 10.0;
-    if (defLang == "RUS") {
-      sprintf(line1, "%02i:%02i %s %2.1f\2C",  lcd_hour, lcd_min, daysOfTheWeekRUS[nedelya], temp_filtered);
-    } else {
-      sprintf(line1, "%02i:%02i %s %2.1f\2C",  lcd_hour, lcd_min, daysOfTheWeekENG[nedelya], temp_filtered);
-    }
+    temp_error = 0;
+    tempC = round(t * 10) / 10.0 + temp_koef;
+    sprintf(temp_char, "%2.1f\2C", tempC);
+    bitWrite(bf, 4, ten_working);
+    bitWrite(bf, 5, fan_working);
+    temp_fan_regulation(tempC);
+    temp_ten_regulation(tempC);
   }
-  sprintf(line2_1, "\1%i", rssi);
-  sprintf(line2_2, "\3%i", led_bright);
-  printLCD(2, 0, 0, convertValue(line1, 16), convertValue(line2_1, 5), 0);
-  printLCD(1, 0, 6, "", convertValue(line2_2, 4), 0);
-  temp_fan_regulation(temp_filtered);
-  temp_ten_regulation(temp_filtered);
-  led_schedule();
-  relay_schedule();
+}
 
-  updateZnak(4, fan_working,    13, 1);
-  updateZnak(5, ten_working,    14, 1);
-  updateZnak(6, ws_working,     15, 1);
-  updateZnak("1", relay1_working, 11, 1);
-  updateZnak("2", relay2_working, 12, 1);
-
-  bitWrite(bitFlags, 1, mqtt_working);
-  bitWrite(bitFlags, 2, relay2_working);
-  bitWrite(bitFlags, 3, relay1_working);
-  bitWrite(bitFlags, 4, ten_working);
-  bitWrite(bitFlags, 5, fan_working);
-  update_chart_values();
+void measure_datetime() {
+  readDateTime();
+  readTemp();
+  if (wifi_working < 2) {
+    char led_bright_char[5];
+    char* weekLang = (defLang == "RUS") ? daysOfTheWeekRUS[nedelya] : daysOfTheWeekENG[nedelya];
+    sprintf(led_bright_char, "%d%%", led_bright);
+    sprintf(line1, "%02d:%02d %s %-7s", lcd_hour, lcd_min, weekLang, temp_char);
+    sprintf(line2, "\1%-5d\3%-5s", WiFi.RSSI(), led_bright_char);
+    printLCD(2, 0, line1, line2);
+    switch (bf_rel) {
+      case 0:
+        updateZnak(8, 0, 12, 1);
+        break;
+      case 2:
+        lcd.createChar(8, znak_rel2);
+        updateZnak(8, 1, 12, 1);
+        break;
+      case 1:
+        lcd.createChar(8, znak_rel1);
+        updateZnak(8, 1, 12, 1);
+        break;
+      case 3:
+        lcd.createChar(8, znak_rel12);
+        updateZnak(8, 1, 12, 1);
+        break;
+    }
+    updateZnak(4, fan_working, 13, 1);
+    updateZnak(5, ten_working, 14, 1);
+    updateZnak(6, ws_working,  15, 1);
+    bitWrite(bf, 1, mqtt_working);
+  }
 }
 
 void readJsonValues() {
@@ -126,30 +127,29 @@ void readJsonValues() {
   ten_stop  = jsonReadToFloat(configSetup, "input", 1, 5);
   ten_start = jsonReadToFloat(configSetup, "input", 1, 6);
   mqtt_server   = jsonReadToStr(configSetup, "input", 2, 0);
-  mqtt_port     = jsonReadToInt(configSetup, "input", 2, 1);
+  mqtt_server_ip.fromString(mqtt_server);
+  mqtt_port     = jsonReadToStr(configSetup, "input", 2, 1);
   mqtt_ID       = jsonReadToStr(configSetup, "input", 2, 2);
   mqtt_user     = jsonReadToStr(configSetup, "input", 2, 3);
   mqtt_password = jsonReadToStr(configSetup, "input", 2, 4);
   mqtt_topic    = jsonReadToStr(configSetup, "input", 2, 5);
   timeZone      = jsonReadToInt(configSetup, "input", 3, 2);
   ntpServerName = jsonReadToStr(configSetup, "input", 3, 3).c_str();
-  _ssidAP       = jsonReadToStr(configSetup, "input", 3, 4);
-  _passwordAP   = jsonReadToStr(configSetup, "input", 3, 5);
-  _ssid         = jsonReadToStr(configSetup, "input", 3, 6);
-  _password     = jsonReadToStr(configSetup, "input", 3, 7);
-  ip_str = jsonReadToStr(configSetup, "input", 3, 8).c_str();
+  ssidAP       = jsonReadToStr(configSetup, "input", 3, 4);
+  passwordAP   = jsonReadToStr(configSetup, "input", 3, 5);
+  ssid         = jsonReadToStr(configSetup, "input", 3, 6);
+  password     = jsonReadToStr(configSetup, "input", 3, 7);
+  ip_str     = jsonReadToStr(configSetup, "input", 3, 8);
   ip.fromString(ip_str);
-  ip_gw_str = jsonReadToStr(configSetup, "input", 3, 9).c_str();
+  ip_gw_str  = jsonReadToStr(configSetup, "input", 3, 9);
   ip_gw.fromString(ip_gw_str);
-  port          = jsonReadToInt(configSetup, "input", 3, 10);
-  CheckDelay    = jsonReadToInt(configSetup, "input", 3, 11);
-  n = CheckDelay;
-  defLang = jsonReadToStr(configSetup, "defaultLang");
+  port       = jsonReadToInt(configSetup, "input", 3, 10);
+  defLang    = jsonReadToStr(configSetup, "defaultLang");
   s_mode_led = jsonReadToInt(configSetup, "s_mode", 0);
   s_mode_r1  = jsonReadToInt(configSetup, "s_mode", 1);
   s_mode_r2  = jsonReadToInt(configSetup, "s_mode", 2);
-  max_day   = max_day_percent * maxPWM / 100;   // x = 100 * 1009 / 100 = 100
-  max_night = max_night_percent * maxPWM / 100; // x = 0 * 1009 / 100 = 0
+  max_day    = max_day_percent * 1024 / 100;
+  max_night  = max_night_percent * 1024 / 100;
   for (int a = 0; a <= 1; a++) {
     for (int b = 0; b <= 6; b++) {
       for (int c = 0; c <= 3; c++) {
@@ -170,7 +170,6 @@ void led_schedule() {
     sec_2   = hour_2[nedelya] * 3600 + min_2[nedelya] * 60;  // сек ОТ Закат
     sec_3   = hour_3[nedelya] * 3600 + min_3[nedelya] * 60;  // сек ДО Закат
     sec_now = ds_hour * 3600 + ds_min * 60 + ds_sec;
-    //=============================================================================================================
     switch (s_mode_led) {
       case 0:
         if (sec_now < sec_0 || sec_now > sec_3) { //до рассвета и после заката
@@ -211,6 +210,7 @@ void relay_schedule() {
     sec_2 = hour_2[nedelya] * 3600 + min_2[nedelya] * 60;
     sec_3 = hour_3[nedelya] * 3600 + min_3[nedelya] * 60;
     sec_now  = ds_hour * 3600 + ds_min * 60 + ds_sec;
+
     switch (s_mode_r1) {
       case 0:
         if (sec_now < sec_0 || sec_now > sec_1) {
@@ -228,6 +228,7 @@ void relay_schedule() {
         break;
     }
     digitalWrite(RELAY1PIN, relay1_working);
+    bitWrite(bf_rel, 0, relay1_working);
 
     switch (s_mode_r2) {
       case 0:
@@ -246,31 +247,40 @@ void relay_schedule() {
         break;
     }
     digitalWrite(RELAY2PIN, relay2_working);
+    bitWrite(bf_rel, 1, relay2_working);
   }
 }
 
 void temp_fan_regulation(float t) {
-  if (t != 0) {
-    if (t >= fan_start) {
-      fan_working = 1;
-    } else if (t <= fan_stop) {
-      fan_working = 0;
-    }
-  } else {
-    fan_working = 0;
-  }
+  if (t >= fan_start) fan_working = 1;
+  if (t <= fan_stop) fan_working = 0;
   digitalWrite(FANPIN, fan_working);
 }
 
 void temp_ten_regulation(float t) {
-  if (t != 0) {
-    if (t <= ten_start) {
-      ten_working = 1;
-    } else if (t >= ten_stop) {
-      ten_working = 0;
-    }
-  } else {
-    ten_working = 0;
-  }
+  if (t <= ten_start) ten_working = 1;
+  if (t >= ten_stop) ten_working = 0;
   digitalWrite(TENPIN, ten_working);
+}
+
+void update_chart_values() {
+  int ostatok = ds_hour % 2;
+  if (ostatok == 0 && chartFlag == 0 && tempC != 85.0 || tempC != -127.0) {
+    int point = ds_hour / 2;
+    jsonWrite(configChart, "days", ds_day, point, tempC);
+    saveConfigChart();
+    chartFlag = 1;
+  } else if (ostatok != 0) {
+    chartFlag = 0;
+  }
+}
+
+void restart_esp() {
+  Serial.println("RESTARTING ESP8266. PLEASE WAIT...");
+  printLCD(2, 0, "   RESTARTING   ", "PLEASE WAIT...  ");
+  delay(1500);
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_OFF);
+  WiFi.disconnect(true);
+  ESP.restart();
 }
