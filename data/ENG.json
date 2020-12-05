@@ -13,5 +13,5 @@
 "popup":["Restart ESP8266-12E?", "Reboot is required"],
 "but": ["Loading...", "Successful", "Error", "Manual enter", "Autosync", "Save", "Open", "Upload", "Restart"],
 "s_mode": ["Auto", "On", "Off"],
-"mes": ["FAILURE", "RTC ERROR"]
+"mes": ["-||-", "RTC ERROR"]
 }
