@@ -30,7 +30,7 @@ extern "C" {
 #define FANPIN        15 //D8 GPIO15   
 #define RELAY1PIN     16 //D0 GPIO16
 #define RELAY2PIN     13 //D7 GPIO13
-String fwver = "5.4";
+String fwver = "5.2";
 String fwver_web;
 #define reconnectTime 10
 #define waitForTemp 10
