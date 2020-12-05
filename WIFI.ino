@@ -38,14 +38,7 @@ void WiFiEvent(WiFiEvent_t event) {
       disconnectCounter--;
       if (!disconnectCounter) {
         disconnectCounter = reconnectTime;
-        IPAddress apIP(192, 168, 4, 1);
-        WiFi.disconnect(true);
-        WiFi.mode(WIFI_AP);
-        WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-        WiFi.softAP(ssidAP, passwordAP);
-        lcd.createChar(1, znak_wifi_ap);
-        Serial.printf("\nAP CREATED SUCCESSFULLY \nSSID: %s | PASSWORD: %s \nIP ADDRESS: 192.168.4.1\n", ssidAP.c_str(), passwordAP.c_str());
-        printLCD(2, 0, "   AP CREATED   ", "IP: 192.168.4.1 ");
+        initAP();
       }
       break;
     case WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED:
@@ -73,10 +66,25 @@ void initSTA() {
     IPAddress ip_subnet(255, 255, 255, 0);
     WiFi.config(ip, ip_gw, ip_subnet, ip_gw);
   }
+  //Serial.printf("\nssid: %s | password: %s\n", ssid.c_str(), password.c_str());
   if (ssid != "" && password != "") {
     WiFi.begin(ssid, password);
   }
 }
+
+void initAP() {
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_OFF);
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_AP);
+  IPAddress apIP(192, 168, 4, 1);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  WiFi.softAP(ssidAP, passwordAP);
+  lcd.createChar(1, znak_wifi_ap);
+  Serial.printf("\nAP CREATED SUCCESSFULLY \nSSID: %s | PASSWORD: %s \nIP ADDRESS: 192.168.4.1\n", ssidAP.c_str(), passwordAP.c_str());
+  printLCD(2, 0, "   AP CREATED   ", "IP: 192.168.4.1 ");
+}
+
 
 void prinScanResult(int networksFound) {
   for (int i = 0; i < networksFound; i++) {

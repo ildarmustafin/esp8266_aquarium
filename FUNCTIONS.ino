@@ -117,8 +117,10 @@ void measure_datetime() {
 }
 
 void readJsonValues() {
-  jsonWrite(configSetup, "ver", ver);
+  jsonWrite(configSetup, "ver", 0, fwver);
   saveConfigSetup();
+  fw_lastModified = jsonReadToLong(configSetup, "lastModified", 0);
+  fs_lastModified = jsonReadToLong(configSetup, "lastModified", 1);
   temp_koef = jsonReadToFloat(configSetup, "input", 1, 0);
   max_day_percent   = jsonReadToInt(configSetup, "input", 1, 1);
   max_night_percent = jsonReadToInt(configSetup, "input", 1, 2);
@@ -283,4 +285,20 @@ void restart_esp() {
   WiFi.mode(WIFI_OFF);
   WiFi.disconnect(true);
   ESP.restart();
+}
+
+void updateTimeNTP() {
+  now = time(nullptr);
+  struct tm * tm = localtime(&now);
+  if (tm->tm_year == 70) {
+    isSyncOK = 0;
+  } else {
+    isSyncOK = 1;
+    days = tm->tm_mday;
+    months = tm->tm_mon + 1;
+    years = tm->tm_year + 1900;
+    hours = tm->tm_hour;
+    minutes = tm->tm_min;
+    seconds = tm->tm_sec;
+  }
 }

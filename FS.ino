@@ -12,12 +12,14 @@ void initFileSystem(void) {
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(LittleFS, "/index.htm", "text/html");
   });
-  server.serveStatic("/index.htm", LittleFS, "/index.htm", "max-age=2592000");
+  server.on("/info", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/html", debug_page, processor);
+  });
+  server.serveStatic("/debug", LittleFS, "/debug.htm");
   server.serveStatic("/bootstrap.min.css", LittleFS, "/bootstrap.min.css", "max-age=2592000");
   server.serveStatic("/style.css", LittleFS, "/style.css", "max-age=2592000");
   server.serveStatic("/chartist.min.js", LittleFS, "/chartist.min.js", "max-age=2592000");
   server.serveStatic("/functions.js", LittleFS, "/functions.js", "max-age=2592000");
-
   server.serveStatic("/css_sprites.png", LittleFS, "/css_sprites.png", "max-age=2592000");
   server.serveStatic("/RUS.json", LittleFS, "/RUS.json", "max-age=2592000");
   server.serveStatic("/ENG.json", LittleFS, "/ENG.json", "max-age=2592000");
@@ -66,7 +68,7 @@ void initFileSystem(void) {
     updateTimeNTP();
     if (!isSyncOK) {
       printLCD(2, 0, "  NO INTERNET   ", "   CONNECTION   ");
-      request->send(404, "text/plain", "");
+      request->send(404, "text/plain", "NO INTERNET CONNECTION...");
     } else {
       rtc.adjust(DateTime(years, months, days, hours, minutes, seconds));
       Serial.printf("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", days, months, years, hours, minutes, seconds);
@@ -83,8 +85,8 @@ void initFileSystem(void) {
     fan_stop  = request->arg("input[1][4]").toFloat();
     ten_start = request->arg("input[1][5]").toFloat();
     ten_stop  = request->arg("input[1][6]").toFloat();
-    max_day   = max_day_percent * maxPWM / 100;   // x = 100 * 1009 / 100 = 100
-    max_night = max_night_percent * maxPWM / 100; // x = 0 * 1009 / 100 = 0
+    max_day   = max_day_percent * 1024 / 100;   // x = 100 * 1009 / 100 = 100
+    max_night = max_night_percent * 1024 / 100; // x = 0 * 1009 / 100 = 0
     jsonWrite(configSetup, "input", 1, 0, temp_koef);
     jsonWrite(configSetup, "input", 1, 1, max_day_percent);
     jsonWrite(configSetup, "input", 1, 2, max_night_percent);
@@ -171,62 +173,137 @@ void initFileSystem(void) {
     saveConfigSetup();
     request->send(200, "text/plain", "");
   });
-  server.on("/info", HTTP_GET, [](AsyncWebServerRequest * request) {
-    char suc[500];
-    sprintf(suc, "<META http-equiv=\"refresh\" content=\"1;URL=/info\"><label>ChipId: %s</label><br/><label>FlashChipSize: %s bytes</label><br/><label>FreeSketchSpace: %s bytes</label><br/><label>FreeHeap: %s bytes</label><br/>",
-            String(ESP.getChipId()).c_str(),
-            String(ESP.getFlashChipSize()).c_str(),
-            String(ESP.getFreeSketchSpace()).c_str(),
-            String(ESP.getFreeHeap()).c_str());
-    request->send_P(200, "text/html", suc);
-  });
-
-  server.on("/update", HTTP_POST, [](AsyncWebServerRequest * request) {
-    request->send_P(200, "text/html", successResponse);
-  }, handleDoUpdate);
 
   server.onNotFound([](AsyncWebServerRequest * request) {
+    Serial.printf("NOT_FOUND: ");
+    if (request->method() == HTTP_GET)
+      Serial.printf("GET");
+    else if (request->method() == HTTP_POST)
+      Serial.printf("POST");
+    else if (request->method() == HTTP_DELETE)
+      Serial.printf("DELETE");
+    else if (request->method() == HTTP_PUT)
+      Serial.printf("PUT");
+    else if (request->method() == HTTP_PATCH)
+      Serial.printf("PATCH");
+    else if (request->method() == HTTP_HEAD)
+      Serial.printf("HEAD");
+    else if (request->method() == HTTP_OPTIONS)
+      Serial.printf("OPTIONS");
+    else
+      Serial.printf("UNKNOWN");
+    Serial.printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
+
+    if (request->contentLength()) {
+      Serial.printf("_CONTENT_TYPE: %s\n", request->contentType().c_str());
+      Serial.printf("_CONTENT_LENGTH: %u\n", request->contentLength());
+    }
+
+    int headers = request->headers();
+    int i;
+    for (i = 0; i < headers; i++) {
+      AsyncWebHeader* h = request->getHeader(i);
+      Serial.printf("_HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
+    }
+    int params = request->params();
+    for (i = 0; i < params; i++) {
+      AsyncWebParameter* p = request->getParam(i);
+      if (p->isFile()) {
+        Serial.printf("_FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+      } else if (p->isPost()) {
+        Serial.printf("_POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+      } else {
+        Serial.printf("_GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+      }
+    }
     request->send(404);
   });
+
+  /*
+    server.onNotFound([](AsyncWebServerRequest * request) {
+    request->send(404);
+    });
+  */
+  
+  server.on("/update", HTTP_POST, [](AsyncWebServerRequest * request) {
+    if (request->hasParam("lastModified", true)) {
+      AsyncWebParameter* p = request->getParam("lastModified", true);
+      //p->name().c_str(), p->value().c_str(), p->size()
+      int modif = (cmd == U_FLASH) ? 0 : 1;
+      jsonWrite(configSetup, "lastModified", modif, p->value().c_str());
+      saveConfigSetup();
+    }
+    request->send_P(200, "text/html", "UPDATE SUCCESS");
+  }, handle_update_progress_cb);
+
   server.begin();
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
   server.addHandler(&events);
 }
 
-void handleDoUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
+void handle_update_progress_cb(AsyncWebServerRequest * request, const String & filename, size_t index, uint8_t *data, size_t len, bool final) {
   if (!index) {
-    Serial.printf("--UPLOAD_FILE_START-- \nUpdate filename: %s \n", filename.c_str());
+    cmd = (filename.indexOf("spiffs") > -1 || filename.indexOf("littlefs") > -1) ? U_FS : U_FLASH;
+    const char * text_cmd = (cmd == U_FS) ? "FILESYSTEM" : "FIRMWARE";
     content_len = request->contentLength();
-    int cmd = (filename.indexOf("spiffs") > -1) ? U_PART : U_FLASH;
-    Update.runAsync(true);
-    wifi_working = 2;
-    timer_mqtt.detach();
+    size_t fsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+    uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+    Serial.printf("\nUPDATE TYPE: %s\nFILENAME:    %s\n--UPLOAD_FILE_START--\n", text_cmd, filename.c_str());
     timer_datetime.detach();
     timer_websocket.detach();
-    if (!Update.begin(content_len, cmd)) {
+    timer_websocket.attach(1, send_values_by_websocket);
+    timer_mqtt.detach();
+    mqttClient.disconnect();
+
+    Update.runAsync(true);
+    if (!Update.begin((cmd == U_FS) ? fsSize : maxSketchSpace, cmd)) {
       Update.printError(Serial);
+      return request->send(400, "text/plain", "OTA could not begin");
     }
   }
-
   if (Update.write(data, len) != len) {
     Update.printError(Serial);
   } else {
-    int perc = map(Update.progress(), 0, Update.size(), 0, 100);
+    wifi_working = 2;
+    perc = Update.progress() * 100 / content_len;
     initBar2();
     sprintf(line1, "%-8i (%3i %%)", Update.progress(), perc);
     lcd.setCursor(0, 0);
     lcd.print(line1);
     fillBar2(0, 1, 16, perc);
-    Serial.printf("Writing: %i bytes (%i %%) \n", Update.progress(), perc);
+    Serial.printf("Writing: %i / %i bytes (%i %%) \n", Update.progress(), content_len, perc);
   }
   if (final) {
     if (!Update.end(true)) {
       Update.printError(Serial);
     } else {
-      Serial.printf("--UPLOAD_FILE_END-- \nUpdate Success: %u\n", Update.size());
+      Serial.printf("--UPLOAD_FILE_END-- \nUPDATE SUCCESS: %u\n", content_len);
       Serial.flush();
+      perc = 100;
       restart_once.once(0.5, restart_esp);
     }
   }
+}
+
+String processor(const String & var) {
+  char chID[15];
+  char fchID[15];
+  sprintf(chID, "%08X", ESP.getChipId());
+  sprintf(fchID, "%08X", ESP.getFlashChipId());
+  if (var == "GETFREEHEAP") return String(ESP.getFreeHeap()).c_str();
+  if (var == "GETCOREVER") return String(ESP.getCoreVersion()).c_str();
+  if (var == "GETBOOTVER") return String(system_get_boot_version()).c_str();
+  if (var == "GETCPUFREQMHZ") return String(ESP.getCpuFreqMHz()).c_str();
+  if (var == "GETSDKVER") return String(ESP.getSdkVersion()).c_str();
+  if (var == "GETSKETCHMD5") return String(ESP.getSketchMD5()).c_str();
+  if (var == "GETCHIPID") return chID;
+  if (var == "GETFLASHCHIPID") return fchID;
+  if (var == "GETFLAHCHIPREALSIZE") return String(ESP.getFlashChipRealSize()).c_str();
+  if (var == "GETFLAHCHIPSIZE") return String(ESP.getFlashChipSize()).c_str();
+  if (var == "GETFREESKETCHSPACE") return String(ESP.getFreeSketchSpace()).c_str();
+  if (var == "GETSKETCHSIZE") return String(ESP.getSketchSize()).c_str();
+  if (var == "GETFLASHCHIPSPEED") return String(ESP.getFlashChipSpeed() / 1000000).c_str();
+  if (var == "GETCYCLECOUNT") return String(ESP.getCycleCount()).c_str();
+  return String();
 }
