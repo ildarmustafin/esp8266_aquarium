@@ -55,7 +55,7 @@ The libraries used in the sketch are in the libraries.zip archive.
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/options_1Mb.JPG)
 
 
-[release_svg]:   https://img.shields.io/badge/release-5.1a-red.svg
+[release_svg]:   https://img.shields.io/badge/release-5.2-blue.svg
 [release_path]:  https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
 [forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-Lime.svg
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
