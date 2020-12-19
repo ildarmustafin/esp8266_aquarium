@@ -16,7 +16,7 @@ void printLCD(byte colEmpty, byte col, char* line1, char* line2) {
 void updateZnak(byte printB, bool value, byte col, byte row) {
   if (value) {
     lcd.setCursor(col, row);
-    lcd.printByte(printB);
+    lcd.write(printB);
   } else {
     lcd.setCursor(col, row);
     lcd.print(" ");

@@ -46,7 +46,7 @@ void WiFiEvent(WiFiEvent_t event) {
       WiFi.scanNetworksAsync(prinScanResult);
       break;
     case WIFI_EVENT_STAMODE_AUTHMODE_CHANGE:
-      Serial.printf("\nINITIALIZING WIFI MODULE\n");
+      Serial.printf("\nINITIALIZE WIFI MODULE\n");
       break;
     case WIFI_EVENT_SOFTAPMODE_STACONNECTED:
       Serial.printf("CLIENT CONNECTED\n");
@@ -62,12 +62,12 @@ void initSTA() {
   WiFi.mode(WIFI_OFF);
   WiFi.disconnect(true);
   WiFi.mode(WIFI_STA);
-  if (ip_str != "" && ip_gw_str != "") {
+  if (!ip_str.isEmpty() && !ip_gw_str.isEmpty()) {
     IPAddress ip_subnet(255, 255, 255, 0);
     WiFi.config(ip, ip_gw, ip_subnet, ip_gw);
   }
-  //Serial.printf("\nssid: %s | password: %s\n", ssid.c_str(), password.c_str());
-  if (ssid != "" && password != "") {
+
+  if (!ssid.isEmpty() && !password.isEmpty()) {
     WiFi.begin(ssid, password);
   }
 }

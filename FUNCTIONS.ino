@@ -1,8 +1,23 @@
+/* bf pins
+  7  6  5  4  3  2  1  0
+  |  |  |  |  |  |  |  |
+  |  |  |  |  |  |  |  now_is_Valid
+  |  |  |  |  |  |  MQTT_connected
+  |  |  |  |  |  RELAY_2
+  |  |  |  |  RELAY_1
+  |  |  |  TEN
+  |  |  FAN
+  |  EMPTY
+  EMPTY
+*/
+
 void readDateTime() {
+  s_mode_r1  = jsonReadToInt(configSetup, "s_mode", 1);
+  s_mode_r2  = jsonReadToInt(configSetup, "s_mode", 2);
   DateTime now = rtc.now();
   nowisValid = now.isValid();
   if (!nowisValid) {
-    if (nowisValid != old_valid) {  //при изменении ошибки, выводит 1 раз сообщение на ком-порт
+    if (nowisValid != old_valid) {
       Serial.printf("[%s]: %2.1fC | LED_value:%i\n", dt_now.c_str(), tempC, LED_value);
       old_valid = nowisValid;
     }
@@ -11,15 +26,19 @@ void readDateTime() {
     } else {
       lcd_hour = 0;
       lcd_min = 0;
-      dt_now = "";
+      //dt_now = "";
+      dt_now = "2020-12-12T09:15:40";
       led_bright = 0;
-      relay1_working = 0;
-      relay2_working = 0;
+      bitSet(bf, 0);
+      //bitClear(bf, 0);
       analogWrite(LEDPIN, 0);
-      digitalWrite(RELAY1PIN, relay1_working);
-      digitalWrite(RELAY2PIN, relay2_working);
+      bitClear(bf, 3);
+      bitClear(bf, 2);
+      digitalOutput(RELAY1PIN, 3);
+      digitalOutput(RELAY2PIN, 2);
     }
   } else {
+    bitSet(bf, 0);
     dt_now = now.timestamp();
     ds_day = now.day();
     ds_month = now.month();
@@ -42,8 +61,6 @@ void readDateTime() {
         lcd.createChar(7, znak_B);
         break;
     }
-    bitWrite(bf, 2, relay2_working);
-    bitWrite(bf, 3, relay1_working);
     lcd_hour = ds_hour;
     lcd_min = ds_min;
     led_schedule();
@@ -66,17 +83,15 @@ void readTemp() {
     } else {
       tempC = round(t * 10) / 10.0 + temp_koef;
       sprintf(temp_char, "--.-\2C");
-      fan_working = 0;
-      ten_working = 0;
-      digitalWrite(FANPIN, fan_working);
-      digitalWrite(TENPIN, ten_working);
+      bitClear(bf, 5);
+      bitClear(bf, 4);
+      digitalOutput(FANPIN, 5);
+      digitalOutput(TENPIN, 4);
     }
   } else {
     temp_error = 0;
     tempC = round(t * 10) / 10.0 + temp_koef;
     sprintf(temp_char, "%2.1f\2C", tempC);
-    bitWrite(bf, 4, ten_working);
-    bitWrite(bf, 5, fan_working);
     temp_fan_regulation(tempC);
     temp_ten_regulation(tempC);
   }
@@ -109,18 +124,16 @@ void measure_datetime() {
         updateZnak(8, 1, 12, 1);
         break;
     }
-    updateZnak(4, fan_working, 13, 1);
-    updateZnak(5, ten_working, 14, 1);
+    updateZnak(4, bitRead(bf, 5), 13, 1);
+    updateZnak(5, bitRead(bf, 4), 14, 1);
     updateZnak(6, ws_working,  15, 1);
-    bitWrite(bf, 1, mqtt_working);
   }
 }
 
 void readJsonValues() {
   jsonWrite(configSetup, "ver", 0, fwver);
   saveConfigSetup();
-  fw_lastModified = jsonReadToLong(configSetup, "lastModified", 0);
-  fs_lastModified = jsonReadToLong(configSetup, "lastModified", 1);
+  fsver = jsonReadToStr(configSetup, "ver", 1);
   temp_koef = jsonReadToFloat(configSetup, "input", 1, 0);
   max_day_percent   = jsonReadToInt(configSetup, "input", 1, 1);
   max_night_percent = jsonReadToInt(configSetup, "input", 1, 2);
@@ -128,6 +141,7 @@ void readJsonValues() {
   fan_stop  = jsonReadToFloat(configSetup, "input", 1, 4);
   ten_stop  = jsonReadToFloat(configSetup, "input", 1, 5);
   ten_start = jsonReadToFloat(configSetup, "input", 1, 6);
+  chk_inverse = jsonReadToInt(configSetup, "input", 1, 7);
   mqtt_server   = jsonReadToStr(configSetup, "input", 2, 0);
   mqtt_server_ip.fromString(mqtt_server);
   mqtt_port     = jsonReadToStr(configSetup, "input", 2, 1);
@@ -146,7 +160,7 @@ void readJsonValues() {
   ip_gw_str  = jsonReadToStr(configSetup, "input", 3, 9);
   ip_gw.fromString(ip_gw_str);
   port       = jsonReadToInt(configSetup, "input", 3, 10);
-  defLang    = jsonReadToStr(configSetup, "defaultLang");
+  defLang    = jsonReadToStr(configSetup, "defaultLang").c_str();
   s_mode_led = jsonReadToInt(configSetup, "s_mode", 0);
   s_mode_r1  = jsonReadToInt(configSetup, "s_mode", 1);
   s_mode_r2  = jsonReadToInt(configSetup, "s_mode", 2);
@@ -191,7 +205,7 @@ void led_schedule() {
         break;
       case 1:
         led_bright = 100;
-        analogWrite(LEDPIN, 1023);
+        analogWrite(LEDPIN, 1024);
         break;
       case 2:
         led_bright = 0;
@@ -212,67 +226,60 @@ void relay_schedule() {
     sec_2 = hour_2[nedelya] * 3600 + min_2[nedelya] * 60;
     sec_3 = hour_3[nedelya] * 3600 + min_3[nedelya] * 60;
     sec_now  = ds_hour * 3600 + ds_min * 60 + ds_sec;
+    rele_function(s_mode_r1, 3);
+    rele_function(s_mode_r2, 2);
+    digitalOutput(RELAY1PIN, 3);
+    digitalOutput(RELAY2PIN, 2);
+    bitWrite(bf_rel, 0, bitRead(bf, 3));
+    bitWrite(bf_rel, 1, bitRead(bf, 2));
+  }
+}
 
-    switch (s_mode_r1) {
-      case 0:
-        if (sec_now < sec_0 || sec_now > sec_1) {
-          relay1_working = 0;
-        }
-        if (sec_now >= sec_0 && sec_now <= sec_1) {
-          relay1_working = 1;
-        }
-        break;
-      case 1:
-        relay1_working = 1;
-        break;
-      case 2:
-        relay1_working = 0;
-        break;
-    }
-    digitalWrite(RELAY1PIN, relay1_working);
-    bitWrite(bf_rel, 0, relay1_working);
-
-    switch (s_mode_r2) {
-      case 0:
-        if (sec_now < sec_2 || sec_now > sec_3) {
-          relay2_working = 0;
-        }
-        if (sec_now >= sec_2 && sec_now <= sec_3) {
-          relay2_working = 1;
-        }
-        break;
-      case 1:
-        relay2_working = 1;
-        break;
-      case 2:
-        relay2_working = 0;
-        break;
-    }
-    digitalWrite(RELAY2PIN, relay2_working);
-    bitWrite(bf_rel, 1, relay2_working);
+void rele_function(byte s_m, byte n) {
+  switch (s_m) {
+    case 0:
+      bf = (n == 3) ? (sec_now < sec_0 || sec_now > sec_1) ? bitClear(bf, n) : (sec_now >= sec_0 && sec_now <= sec_1) ? bitSet(bf, n) : bf :
+           (sec_now < sec_2 || sec_now > sec_3) ? bitClear(bf, n) : (sec_now >= sec_2 && sec_now <= sec_3) ? bitSet(bf, n) : bf;
+      break;
+    case 1:
+      bitSet(bf, n);
+      break;
+    case 2:
+      bitClear(bf, n);
+      break;
   }
 }
 
 void temp_fan_regulation(float t) {
-  if (t >= fan_start) fan_working = 1;
-  if (t <= fan_stop) fan_working = 0;
-  digitalWrite(FANPIN, fan_working);
+  bf = (t >= fan_start) ? bitSet(bf, 5) : bf;
+  bf = (t <= fan_stop) ? bitClear(bf, 5) : bf;
+  digitalOutput(FANPIN, 5);
 }
 
 void temp_ten_regulation(float t) {
-  if (t <= ten_start) ten_working = 1;
-  if (t >= ten_stop) ten_working = 0;
-  digitalWrite(TENPIN, ten_working);
+  bf = (t <= ten_start) ? bitSet(bf, 4) : bf;
+  bf = (t >= ten_stop) ? bitClear(bf, 4) : bf;
+  digitalOutput(TENPIN, 4);
+}
+
+void digitalOutput(byte pin, byte bitNumber) {
+  if (chk_inverse) {
+    digitalWrite(pin, !bitRead(bf, bitNumber));
+  } else {
+    digitalWrite(pin, bitRead(bf, bitNumber));
+  }
 }
 
 void update_chart_values() {
   int ostatok = ds_hour % 2;
-  if (ostatok == 0 && chartFlag == 0 && tempC != 85.0 || tempC != -127.0) {
+  //if (ostatok == 0 && chartFlag == 0 && tempC != 85.0 || tempC != -127.0) {
+  //if (!ostatok && !chartFlag && tempC != 85.0 || tempC != -127.0) {
+  if (!ostatok && !chartFlag) {
     int point = ds_hour / 2;
     jsonWrite(configChart, "days", ds_day, point, tempC);
     saveConfigChart();
     chartFlag = 1;
-  } else if (ostatok != 0) {
+  } else if (ostatok) {
     chartFlag = 0;
   }
 }
@@ -295,8 +302,8 @@ void updateTimeNTP() {
   } else {
     isSyncOK = 1;
     days = tm->tm_mday;
-    months = tm->tm_mon + 1;
-    years = tm->tm_year + 1900;
+    month = tm->tm_mon + 1;
+    year = tm->tm_year + 1900;
     hours = tm->tm_hour;
     minutes = tm->tm_min;
     seconds = tm->tm_sec;

@@ -28,8 +28,8 @@ void initFileSystem(void) {
   server.serveStatic("/configChart.json", LittleFS, "/configChart.json");
 
   server.on("/lang", HTTP_GET, [] (AsyncWebServerRequest * request) {
-    defLang = request->arg("defaultLang");
-    jsonWrite(configSetup, "defaultLang", defLang);
+    defLang = request->arg("defaultLang").c_str();
+    jsonWrite(configSetup, "defaultLang", String(defLang));
     saveConfigSetup();
     request->send(200, "text/plain", "");
   });
@@ -49,15 +49,20 @@ void initFileSystem(void) {
   server.on("/save_date", HTTP_GET, [](AsyncWebServerRequest * request) {
     String date_man = request->arg("input[3][0]");
     String time_man = request->arg("input[3][1]");
-    sscanf(date_man.c_str(), "%i-%d-%d", &years, &months, &days);
+    sscanf(date_man.c_str(), "%i-%d-%d", &year, &month, &days);
     sscanf(time_man.c_str(), "%d:%d:%d", &hours, &minutes, &seconds);
     jsonWrite(configSetup, "input", 3, 0, date_man);
     jsonWrite(configSetup, "input", 3, 1, time_man);
     saveConfigSetup();
-    rtc.adjust(DateTime(years, months, days, hours, minutes, seconds));
-    Serial.printf("Manual button pressed \nEntered time: %02d.%02d.%02i | %02d:%02d:%02d\n", days, months, years, hours, minutes, seconds);
+    rtc.adjust(DateTime(year, month, days, hours, minutes, seconds));
+    Serial.printf("Manual button pressed \nEntered time: %02d.%02d.%02i | %02d:%02d:%02d\n", days, month, year, hours, minutes, seconds);
     printLCD(1, 0, "", " MANUAL PRESSED ");
-    request->send(200, "text/plain", "");
+    DateTime now = rtc.now();
+    if (days == now.day() && month == now.month() && year == now.year() && hours == now.hour() && minutes == now.minute()) {
+      request->send(200, "text/plain", "OK");
+    } else {
+      request->send(400, "text/plain", "DATETIME IS NOT SET");
+    }
   });
   server.on("/auto_sync", HTTP_GET, [](AsyncWebServerRequest * request) {
     timeZone = request->arg("input[3][2]").toInt();
@@ -68,10 +73,12 @@ void initFileSystem(void) {
     updateTimeNTP();
     if (!isSyncOK) {
       printLCD(2, 0, "  NO INTERNET   ", "   CONNECTION   ");
-      request->send(404, "text/plain", "NO INTERNET CONNECTION...");
+      request->send(400, "text/plain", "NO INTERNET CONNECTION");
+      Serial.printf("No internet. isSyncOK: %i", isSyncOK);
     } else {
-      rtc.adjust(DateTime(years, months, days, hours, minutes, seconds));
-      Serial.printf("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", days, months, years, hours, minutes, seconds);
+      Serial.printf("Internet OK. isSyncOK: %i", isSyncOK);
+      rtc.adjust(DateTime(year, month, days, hours, minutes, seconds));
+      Serial.printf("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", days, month, year, hours, minutes, seconds);
       printLCD(1, 0, "", "AUTOSYNC PRESSED");
       request->send(200, "text/plain", "");
     }
@@ -85,6 +92,7 @@ void initFileSystem(void) {
     fan_stop  = request->arg("input[1][4]").toFloat();
     ten_start = request->arg("input[1][5]").toFloat();
     ten_stop  = request->arg("input[1][6]").toFloat();
+    chk_inverse = request->arg("input[1][7]").toInt();
     max_day   = max_day_percent * 1024 / 100;   // x = 100 * 1009 / 100 = 100
     max_night = max_night_percent * 1024 / 100; // x = 0 * 1009 / 100 = 0
     jsonWrite(configSetup, "input", 1, 0, temp_koef);
@@ -94,6 +102,7 @@ void initFileSystem(void) {
     jsonWrite(configSetup, "input", 1, 4, fan_stop);
     jsonWrite(configSetup, "input", 1, 5, ten_start);
     jsonWrite(configSetup, "input", 1, 6, ten_stop);
+    jsonWrite(configSetup, "input", 1, 7, chk_inverse);
     saveConfigSetup();
     printLCD(1, 0, "", "  SAVE OPTIONS  ");
     request->send(200, "text/plain", "");
@@ -126,10 +135,10 @@ void initFileSystem(void) {
     mqtt_password = request->arg("input[2][4]");
     mqtt_topic = request->arg("input[2][5]");
     mqtt_server_ip.fromString(mqtt_server);
-    if (mqtt_server == "" || mqtt_ID == "" || mqtt_port == "") {
+    if (mqtt_server.isEmpty() || mqtt_ID.isEmpty() || mqtt_port.isEmpty()) {
       mqttClient.disconnect();
       timer_mqtt.detach();
-      mqtt_working = 0;
+      bitClear(bf, 1);
     } else {
       mqttClient.setServer(mqtt_server_ip, mqtt_port.toInt());
       mqttClient.connect();
@@ -218,13 +227,6 @@ void initFileSystem(void) {
     }
     request->send(404);
   });
-
-  /*
-    server.onNotFound([](AsyncWebServerRequest * request) {
-    request->send(404);
-    });
-  */
-  
   server.on("/update", HTTP_POST, [](AsyncWebServerRequest * request) {
     if (request->hasParam("lastModified", true)) {
       AsyncWebParameter* p = request->getParam("lastModified", true);
@@ -235,7 +237,7 @@ void initFileSystem(void) {
     }
     request->send_P(200, "text/html", "UPDATE SUCCESS");
   }, handle_update_progress_cb);
-
+  //server.onFileUpload(handle_update_progress_cb);
   server.begin();
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
@@ -252,14 +254,13 @@ void handle_update_progress_cb(AsyncWebServerRequest * request, const String & f
     Serial.printf("\nUPDATE TYPE: %s\nFILENAME:    %s\n--UPLOAD_FILE_START--\n", text_cmd, filename.c_str());
     timer_datetime.detach();
     timer_websocket.detach();
-    timer_websocket.attach(1, send_values_by_websocket);
+    timer_websocket.attach(2, send_values_by_websocket);
     timer_mqtt.detach();
     mqttClient.disconnect();
-
     Update.runAsync(true);
     if (!Update.begin((cmd == U_FS) ? fsSize : maxSketchSpace, cmd)) {
       Update.printError(Serial);
-      return request->send(400, "text/plain", "OTA could not begin");
+      return request->send(400, "text/plain", "[ERROR] OTA COULD NOT CONTINUE. ");
     }
   }
   if (Update.write(data, len) != len) {
@@ -272,7 +273,7 @@ void handle_update_progress_cb(AsyncWebServerRequest * request, const String & f
     lcd.setCursor(0, 0);
     lcd.print(line1);
     fillBar2(0, 1, 16, perc);
-    Serial.printf("Writing: %i / %i bytes (%i %%) \n", Update.progress(), content_len, perc);
+    Serial.printf("Writing: %i / %i bytes (%i %%)\n", Update.progress(), content_len, perc);
   }
   if (final) {
     if (!Update.end(true)) {
@@ -287,10 +288,12 @@ void handle_update_progress_cb(AsyncWebServerRequest * request, const String & f
 }
 
 String processor(const String & var) {
-  char chID[15];
-  char fchID[15];
-  sprintf(chID, "%08X", ESP.getChipId());
-  sprintf(fchID, "%08X", ESP.getFlashChipId());
+  char chID[16];
+  char fchID[16];
+  snprintf(chID, sizeof(chID), "%08X", ESP.getChipId());
+  snprintf(fchID, sizeof(fchID), "%08X", ESP.getFlashChipId());
+  //sprintf(chID, "%08X", ESP.getChipId());
+  //sprintf(fchID, "%08X", ESP.getFlashChipId());
   if (var == "GETFREEHEAP") return String(ESP.getFreeHeap()).c_str();
   if (var == "GETCOREVER") return String(ESP.getCoreVersion()).c_str();
   if (var == "GETBOOTVER") return String(system_get_boot_version()).c_str();

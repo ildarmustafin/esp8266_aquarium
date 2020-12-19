@@ -26,7 +26,7 @@ int jsonReadToInt(String &json, String name, int a) {
 int jsonReadToInt(String &json, String name, int a, int b) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(json);
-  return root[name][a][b].as<signed int>();  
+  return root[name][a][b].as<signed int>();
 }
 int jsonReadToLong(String &json, String name, int a) {
   DynamicJsonBuffer jsonBuffer;

@@ -6,15 +6,15 @@ void send_values_by_mqtt() {
   }
 }
 void onMqttConnect(bool sessionPresent) {
-  mqtt_working = 1;
-  if (!mqttFlag && mqtt_working) {
+  bitSet(bf, 1);
+  if (!mqttFlag &&  bitRead(bf, 1)) {
     Serial.printf("Установлено MQTT-соединение!\n");
     mqttFlag = 1;
   }
 }
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  mqtt_working = 0;
-  if (mqttFlag && !mqtt_working) {
+  bitClear(bf, 1);
+  if (mqttFlag && ! bitRead(bf, 1)) {
     Serial.printf("MQTT-соединение разорвано!\n");
     mqttFlag = 0;
   }
@@ -27,7 +27,7 @@ void send_values_by_websocket() {
   jsonWrite(jsonLive, "rssi", WiFi.RSSI());
   jsonWrite(jsonLive, "bf", bf);
   jsonWrite(jsonLive, "clws", ws_working);
-  jsonWrite(jsonLive, "perc", perc);  
+  jsonWrite(jsonLive, "perc", perc);
   if (ws_working) ws.textAll(jsonLive);
 }
 
