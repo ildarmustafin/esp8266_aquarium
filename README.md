@@ -12,15 +12,11 @@ Functions implemented in this project:
 8. Editing an NTP server in the web interface
 9. Switch tabs with a swipe
 10. Connect to an existing access point. The ability to reconnect to the AP in case of loss and restoration of connection
-11. FSBrowser - to access files of the file system. Access through 192.168.x.x / edit
-12. Added 2 languages (rus, eng). To add new languages, you must specify the abbreviated name of the language in the lang clause in the configSetup.json file. Next, use a file with the language rus.json or eng.json as a template, register your text and save it as the language name specified in lang
-13. Send JSON by MQTT. Data is not sending on empty options.
-14. You can set static IP on options. IP dynamic, if options is empty.
+11. Added 2 languages (rus, eng). To add new languages, you must specify the abbreviated name of the language in the lang clause in the configSetup.json file. Next, use a file with the language rus.json or eng.json as a template, register your text and save it as the language name specified in lang
+12. Send JSON by MQTT. Data is not sending on empty options.
+13. You can set static IP on options. IP dynamic, if options is empty.
 
 At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 0,5 second. Ability to select a port for access to a web page. The websocket port is /ws.
-
-The libraries used in the sketch are in the libraries.zip archive.
-
 
 *****************************************************************************************************************************************************************************
 Функции, реализованные в данном проекте:
@@ -35,14 +31,11 @@ The libraries used in the sketch are in the libraries.zip archive.
 8. Редактирование NTP-сервера в веб-интерфейсе
 9. Переключение вкладок свайпом
 10. Подключение к существующей точке доступа. Возможность переподключения к ТД при потере и восстановлении связи
-11. FSBrowser - для доступа к файлам файловой системы. Доступ через 192.168.x.x/edit
-12. Добавлены 2 языка(rus,eng). Для добавления новых языков необходимо прописать сокращенное название языка в пункте lang в файле configSetup.json. Далее использовать как шаблон файл с языком rus.json или eng.json, прописать свой текст и сохранить как название языка, указанное в lang
-13. Передача JSON по MQTT. При пустых строках в настройке, передача данных не осуществляется.
-14. Возможно установить статический IP. IP динамический, при пустых строках в настройках.
+11. Добавлены 2 языка(rus,eng). Для добавления новых языков необходимо прописать сокращенное название языка в пункте lang в файле configSetup.json. Далее использовать как шаблон файл с языком rus.json или eng.json, прописать свой текст и сохранить как название языка, указанное в lang
+12. Передача JSON по MQTT. При пустых строках в настройке, передача данных не осуществляется.
+13. Возможно установить статический IP. IP динамический, при пустых строках в настройках.
 
 При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Текущее состояние реле, дата и температура передаются посредством Websocket с частотой в 0,5 сек. Возможность выбора порта для доступа на веб страницу. Порт websocket - /ws.
-
-Библиотеки, используемые в скетче, находятся в архиве libraries.zip.
 
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.JPG)
