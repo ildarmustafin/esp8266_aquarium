@@ -1,4 +1,4 @@
-[![fw_ver_svg][]][fw_ver_path] [![fs_ver_svg][]][fs_ver_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![issues_svg][]][issues_path]
+[![platform_svg][]][platform_path] [![fw_ver_svg][]][fw_ver_path] [![fs_ver_svg][]][fs_ver_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![issues_svg][]][issues_path]
 
 Project was made by PLATFORMIO
 
@@ -49,11 +49,12 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/options_1Mb.JPG)
 
-
-[fw_ver_svg]:   https://img.shields.io/badge/firmware_version-5.3-blue.svg
-[fw_ver_path]:  https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
-[fs_ver_svg]:   https://img.shields.io/badge/filesystem_version-2.5-blue.svg
-[fs_ver_path]:  https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
+[platform_svg]:  https://img.shields.io/badge/Platformio-Red.svg
+[platform_path]: https://platformio.org/platformio-ide
+[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-5.3-blue.svg
+[fw_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
+[fs_ver_svg]:    https://img.shields.io/badge/filesystem_version-2.5-blue.svg
+[fs_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
 [forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-Lime.svg
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
 [stars_svg]:     https://img.shields.io/github/stars/ildarmustafin/esp8266_aquarium.svg
