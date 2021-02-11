@@ -1,7 +1,5 @@
 [![platform_svg][]][platform_path] [![fw_ver_svg][]][fw_ver_path] [![fs_ver_svg][]][fs_ver_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![issues_svg][]][issues_path]
 
-Project was made by PLATFORMIO
-
 Functions implemented in this project:
 
 1. Indicates temperature on the display(LCD1602) and the web interface.
@@ -20,8 +18,6 @@ Functions implemented in this project:
 At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. The current state of the relay, date and temperature are transmitted via Websocket with a frequency of 1 second. Ability to select a port for access to a web page. Websocket connected to your_ip/ws.
 
 *****************************************************************************************************************************************************************************
-Проект реализован на PLATFORMIO
-
 Функции, реализованные в данном проекте:
 
 1. Вывод показаний температуры на дисплей(LCD1602) и веб интерфейс.
