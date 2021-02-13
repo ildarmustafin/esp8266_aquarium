@@ -1,4 +1,4 @@
-[![platform_svg][]][platform_path] [![fw_ver_svg][]][fw_ver_path] [![fs_ver_svg][]][fs_ver_path] [![forum_svg][]][forum_path] [![stars_svg][]][stars_path] [![issues_svg][]][issues_path]
+[![platform_svg][]][platform_path] [![stars_svg][]][stars_path] [![fw_ver_svg][]][fw_ver_path] [![fs_ver_svg][]][fs_ver_path] [![forum_svg][]][forum_path] [![issues_svg][]][issues_path]
 
 Functions implemented in this project:
 
