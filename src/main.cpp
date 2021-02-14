@@ -108,7 +108,6 @@ void measure_datetime()
   //DEBUG_PRINT("line1: %s\n", line1);
   //DEBUG_PRINT("line2: %s\n", line2);
   line_show();
-  printLCD(2, line1, line2);
 }
 
 void setup()
@@ -124,6 +123,36 @@ void setup()
   pinMode(RELAY2PIN, OUTPUT);
   analogWrite(LEDPIN, 0);
   initLCD();
+  ArduinoOTA.setPort(8266);
+
+  ArduinoOTA.onStart([]() {
+    isUpdating = true;
+    //DEBUG_PRINT("Start OTA ");
+  });
+  ArduinoOTA.onEnd([]() {
+    //DEBUG_PRINT("\nEnd OTA");
+    isUpdating = false;
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    isUpdating = true;
+    perc = progress * 100 / total;
+    initBar2();
+    snprintf(line1, 17, "%-8i (%3i %%)", progress, perc);
+    lcd.setCursor(0, 0);
+    lcd.print(line1);
+    fillBar2(0, 1, 16, perc);
+    //DEBUG_PRINT("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    isUpdating = false;  
+    //DEBUG_PRINT("Error[%u]: ", error);
+    //if (error == OTA_AUTH_ERROR) DEBUG_PRINT("Auth Failed");
+    //else if (error == OTA_BEGIN_ERROR) DEBUG_PRINT("Begin Failed");
+    //else if (error == OTA_CONNECT_ERROR) DEBUG_PRINT("Connect Failed");
+    //else if (error == OTA_RECEIVE_ERROR) DEBUG_PRINT("Receive Failed");
+    //else if (error == OTA_END_ERROR) DEBUG_PRINT("End Failed");
+  });
+
   ArduinoOTA.begin();
   initFileSystem();
   digitalWrite(FANPIN, bitRead(aux_bf, 1));
@@ -167,5 +196,6 @@ void loop()
     timer_datetime.detach();
     timer_websocket.detach();
     timer_mqtt.detach();
+    wifi_search.detach();
   }
 }
