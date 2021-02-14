@@ -14,7 +14,7 @@ void readDateTime()
   {
     if (bitRead(bf, 0) != bitRead(aux_bf, 0))
     {
-      //DEBUG_PRINT("[%s]: %2.1fC | LED_value:%i\n", rtc_now.timestamp().c_str(), option.tempC, LED_value);
+      DEBUG_PRINT("[%s]: %2.1fC | LED_value:%i\n", rtc_now.timestamp().c_str(), option.tempC, LED_value);
       bitWrite(aux_bf, 0, bitRead(bf, 0));
     }
     if (date_error < 10)
@@ -59,7 +59,6 @@ void readDateTime()
     update_chart_values();
   }
 }
-
 void readTemp()
 {
   sensors.setWaitForConversion(false);
@@ -69,7 +68,7 @@ void readTemp()
   {
     if (t != option.old_temp)
     {
-      //DEBUG_PRINT("[%s]: Temp:%2.1fC\n", rtc_now.timestamp().c_str(), t);
+      DEBUG_PRINT("[%s]: Temp:%2.1fC\n", rtc_now.timestamp().c_str(), t);
       option.old_temp = t;
     }
     if (temp_error < waitForTemp)
@@ -95,25 +94,26 @@ void readTemp()
     temp_ten_regulation(option.tempC);
   }
 }
-
 void measure_datetime()
 {
   readDateTime();
   readTemp();
   heapCur = ESP.getFreeHeap();
   heapMin = (heapCur < heapMin) ? heapCur : heapMin;
-  //DEBUG_PRINT("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), heapCur, heapMin);
+  DEBUG_PRINT("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), heapCur, heapMin);
   !strcmp(defLang, "RUS") ? strcpy(weekLang, daysOfTheWeekRUS[ntp.week]) : strcpy(weekLang, daysOfTheWeekENG[ntp.week]);
-  //DEBUG_PRINT("heapCur: %i | heapMin: %i | wifi: %i\n", heapCur, heapMin, wifi.working);
-  //DEBUG_PRINT("line1: %s\n", line1);
-  //DEBUG_PRINT("line2: %s\n", line2);
+  DEBUG_PRINT("heapCur: %i | heapMin: %i | wifi: %i\n", heapCur, heapMin, wifi.working);
+  DEBUG_PRINT("line1: %s\n", line1);
+  DEBUG_PRINT("line2: %s\n", line2);
   line_show();
+  DEBUG_PRINT("wifi.working: %i\n", wifi.working);
 }
 
 void setup()
 {
 #ifdef DEBUG_ON
   Serial.begin(115200);
+  Serial.println();
 #endif
   analogWriteFreq(100);
   pinMode(LEDPIN, OUTPUT);
@@ -123,37 +123,7 @@ void setup()
   pinMode(RELAY2PIN, OUTPUT);
   analogWrite(LEDPIN, 0);
   initLCD();
-  ArduinoOTA.setPort(8266);
-
-  ArduinoOTA.onStart([]() {
-    isUpdating = true;
-    //DEBUG_PRINT("Start OTA ");
-  });
-  ArduinoOTA.onEnd([]() {
-    //DEBUG_PRINT("\nEnd OTA");
-    isUpdating = false;
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    isUpdating = true;
-    perc = progress * 100 / total;
-    initBar2();
-    snprintf(line1, 17, "%-8i (%3i %%)", progress, perc);
-    lcd.setCursor(0, 0);
-    lcd.print(line1);
-    fillBar2(0, 1, 16, perc);
-    //DEBUG_PRINT("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    isUpdating = false;  
-    //DEBUG_PRINT("Error[%u]: ", error);
-    //if (error == OTA_AUTH_ERROR) DEBUG_PRINT("Auth Failed");
-    //else if (error == OTA_BEGIN_ERROR) DEBUG_PRINT("Begin Failed");
-    //else if (error == OTA_CONNECT_ERROR) DEBUG_PRINT("Connect Failed");
-    //else if (error == OTA_RECEIVE_ERROR) DEBUG_PRINT("Receive Failed");
-    //else if (error == OTA_END_ERROR) DEBUG_PRINT("End Failed");
-  });
-
-  ArduinoOTA.begin();
+  initOTA();
   initFileSystem();
   digitalWrite(FANPIN, bitRead(aux_bf, 1));
   digitalWrite(TENPIN, bitRead(aux_bf, 1));

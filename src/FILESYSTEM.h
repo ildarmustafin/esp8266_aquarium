@@ -1,7 +1,7 @@
 void initFileSystem(void) {
   LittleFS.begin();
   if (!LittleFS.exists("/configSetup.json")) {
-    //DEBUG_PRINT("\nERROR OPENING LittleFS\n");
+    DEBUG_PRINT("\nERROR OPENING LittleFS\n");
     server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send_P(200, "text/html", upload_spiffs);
     });
@@ -34,7 +34,7 @@ void initFileSystem(void) {
     jsonWrite(configSetup, "defaultLang", defLang);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("LANG CHANGE: OK\n");
+    DEBUG_PRINT("LANG CHANGE: OK\n");
   });
   server.on("/save_schedule", HTTP_GET, [](AsyncWebServerRequest * request) {
     byte selIndex = request->arg("selIndex").toInt();
@@ -47,7 +47,7 @@ void initFileSystem(void) {
     saveConfig("/configSetup.json", configSetup);
     printLCD(1, "", " SAVE SCHEDULE  ");
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("SAVE SCHEDULE: OK\n");
+    DEBUG_PRINT("SAVE SCHEDULE: OK\n");
   });
   server.on("/save_date", HTTP_GET, [](AsyncWebServerRequest * request) {
     String date_man = request->arg("input[3][0]");
@@ -61,11 +61,11 @@ void initFileSystem(void) {
       rtc.adjust(DateTime(ntp.year, ntp.month, ntp.day, ntp.hour, ntp.min, ntp.sec));
       printLCD(1, "", " MANUAL PRESSED ");
       request->send(200, "text/plain", "OK");
-      //DEBUG_PRINT("Manual button pressed \nEntered time: %02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
+      DEBUG_PRINT("Manual button pressed \nEntered time: %02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
     } else {
       printLCD(2, "  NO INTERNET   ", "   CONNECTION   ");
       request->send(400, "text/plain", "ERROR");
-      //DEBUG_PRINT("No internet. now.isValid: %i\n", bitRead(bf, 0));
+      DEBUG_PRINT("No internet. now.isValid: %i\n", bitRead(bf, 0));
     }
   });
   server.on("/auto_sync", HTTP_GET, [](AsyncWebServerRequest * request) {
@@ -76,13 +76,13 @@ void initFileSystem(void) {
     if (!bitRead(aux_bf, 4) || !bitRead(bf, 0)) {
       printLCD(2, "  NO INTERNET   ", "   CONNECTION   ");
       request->send(400, "text/plain", "NO INTERNET CONNECTION");
-      //DEBUG_PRINT("No internet. isSyncOK: %i\n", bitRead(aux_bf, 4));
+      DEBUG_PRINT("No internet. isSyncOK: %i\n", bitRead(aux_bf, 4));
     } else {
       rtc.adjust(DateTime(ntp.year, ntp.month, ntp.day, ntp.hour, ntp.min, ntp.sec));
       printLCD(1, "", "AUTOSYNC PRESSED");
       request->send(200, "text/plain", "OK");
-      //DEBUG_PRINT("Internet OK. isSyncOK: %i\n", bitRead(aux_bf, 4));
-      //DEBUG_PRINT("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
+      DEBUG_PRINT("Internet OK. isSyncOK: %i\n", bitRead(aux_bf, 4));
+      DEBUG_PRINT("Autosync button pressed \nNTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
     }
   });
   server.on("/save", HTTP_GET, [](AsyncWebServerRequest * request) {
@@ -107,14 +107,14 @@ void initFileSystem(void) {
     saveConfig("/configSetup.json", configSetup);
     printLCD(1, "", "  SAVE OPTIONS  ");
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("SAVE TRANSMITTERS: OK\n");
+    DEBUG_PRINT("SAVE TRANSMITTERS: OK\n");
   });
   server.on("/chartDays", HTTP_GET, [](AsyncWebServerRequest * request) {
     byte chartDays = request->arg("input[0][0]").toInt();
     jsonWrite(configSetup, "input", 0, 0, chartDays);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("SAVE CHART DAYS: OK\n");
+    DEBUG_PRINT("SAVE CHART DAYS: OK\n");
   });
   server.on("/s_mode", HTTP_GET, [](AsyncWebServerRequest * request) {
     s_mode_led = request->arg("s_mode[0]").toInt();
@@ -125,7 +125,7 @@ void initFileSystem(void) {
     jsonWrite(configSetup, "s_mode", 2, s_mode_r2);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("SAVE S_MODE: OK\n");
+    DEBUG_PRINT("SAVE S_MODE: OK\n");
   });
   server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest * request) {
     mqttClient.disconnect();
@@ -153,12 +153,12 @@ void initFileSystem(void) {
     jsonWrite(configSetup, "input", 2, 5, mqtt.topic);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("SAVE MQTT: OK\n");
+    DEBUG_PRINT("SAVE MQTT: OK\n");
   });
   server.on("/restart", HTTP_POST, [](AsyncWebServerRequest * request) {
     String restart = request->arg("device");
     if (restart == "1") {
-      //DEBUG_PRINT("RESTART: OK\n");
+      DEBUG_PRINT("RESTART: OK\n");
       request->send(200, "text/plain", "OK");
       restart_once.once(0.5, restart_esp);
     }
@@ -183,7 +183,7 @@ void initFileSystem(void) {
     jsonWrite(configSetup, "input", 3, 9, wifi.port);      //web_port
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "OK");
-    //DEBUG_PRINT("SAVE WIFI: OK\n");
+    DEBUG_PRINT("SAVE WIFI: OK\n");
   });
 
   server.onFileUpload([](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
@@ -198,7 +198,7 @@ void initFileSystem(void) {
       content_len = request->contentLength();
       cmd = (filename.indexOf("spiffs") > -1 || filename.indexOf("littlefs") > -1) ? 100 : 0; //U_FS : U_FLASH;
       fsSize = ((size_t)&_FS_end - (size_t)&_FS_start);
-      //DEBUG_PRINT("\nUPDATE TYPE: %s\nFILENAME:    %s\n--UPLOAD_FILE_START--\n", (cmd) ? "FILESYSTEM" : "FIRMWARE", filename.c_str());
+      DEBUG_PRINT("\nUPDATE TYPE: %s\nFILENAME:    %s\n--UPLOAD_FILE_START--\n", (cmd) ? "FILESYSTEM" : "FIRMWARE", filename.c_str());
       Update.runAsync(true);
       if (!Update.begin((cmd) ? fsSize : content_len, cmd))
       {
@@ -220,7 +220,7 @@ void initFileSystem(void) {
       lcd.setCursor(0, 0);
       lcd.print(line1);
       fillBar2(0, 1, 16, perc);
-      //DEBUG_PRINT("Writing: %i / %i bytes (%i %%)\n", Update.progress(), Update.size(), perc);
+      DEBUG_PRINT("Writing: %i / %i bytes (%i %%)\n", Update.progress(), Update.size(), perc);
     }
     if (final)
     {
@@ -231,7 +231,7 @@ void initFileSystem(void) {
       }
       else
       {
-        //DEBUG_PRINT("--UPLOAD_FILE_END-- \nUPDATE SUCCESS: %u\n", (cmd) ? fsSize : content_len);
+        DEBUG_PRINT("--UPLOAD_FILE_END-- \nUPDATE SUCCESS: %u\n", (cmd) ? fsSize : content_len);
         restart_once.once(0.5, restart_esp);
       }
       isUpdating = false;

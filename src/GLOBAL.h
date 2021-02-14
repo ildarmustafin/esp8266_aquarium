@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 struct ver_t {
-  char fw[6] = "5.4";
+  char fw[6] = "5.3";
   char fs[6] = "-.-";
 } ver;
 

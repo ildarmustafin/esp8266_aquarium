@@ -70,7 +70,7 @@ void updateTimeNTP() {
   }
 }
 void restart_esp() {
-  //DEBUG_PRINT("RESTARTING ESP8266. PLEASE WAIT...\n");
+  DEBUG_PRINT("RESTARTING ESP8266. PLEASE WAIT...\n");
   printLCD(2, "   RESTARTING   ", "PLEASE WAIT...  ");
   delay(2000);
   WiFi.mode(WIFI_OFF);
@@ -177,4 +177,35 @@ void temp_ten_regulation(float t) {
   bf = (t <= option.ten_start) ? bitSet(bf, 4) : bf;
   bf = (t >= option.ten_stop) ? bitClear(bf, 4) : bf;
   digitalOutput(TENPIN, 4);
+}
+void initOTA() {
+  ArduinoOTA.setPort(8266);
+  ArduinoOTA.onStart([]() {
+    isUpdating = true;
+    DEBUG_PRINT("Start OTA ");
+  });
+  ArduinoOTA.onEnd([]() {
+    DEBUG_PRINT("\nEnd OTA");
+    isUpdating = false;
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    isUpdating = true;
+    perc = progress * 100 / total;
+    initBar2();
+    snprintf(line1, 17, "%-8i (%3i %%)", progress, perc);
+    lcd.setCursor(0, 0);
+    lcd.print(line1);
+    fillBar2(0, 1, 16, perc);
+    DEBUG_PRINT("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    isUpdating = false;  
+    DEBUG_PRINT("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) DEBUG_PRINT("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) DEBUG_PRINT("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) DEBUG_PRINT("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) DEBUG_PRINT("Receive Failed");
+    else if (error == OTA_END_ERROR) DEBUG_PRINT("End Failed");
+  });
+  ArduinoOTA.begin();
 }

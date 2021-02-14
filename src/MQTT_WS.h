@@ -16,14 +16,14 @@ void connectToMqtt() {
 void onMqttConnect(bool sessionPresent) {
   bitSet(bf, 1);
   if (!bitRead(aux_bf, 3) && bitRead(bf, 1)) {
-    //DEBUG_PRINT("Установлено MQTT-соединение!: %i\n", bitRead(bf, 1));
+    DEBUG_PRINT("Установлено MQTT-соединение!: %i\n", bitRead(bf, 1));
     bitSet(aux_bf, 3);
   }
 }
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   bitClear(bf, 1);
   if (bitRead(aux_bf, 3) && !bitRead(bf, 1)) {
-    //DEBUG_PRINT("MQTT-соединение разорвано!: %i\n", bitRead(bf, 1));
+    DEBUG_PRINT("MQTT-соединение разорвано!: %i\n", bitRead(bf, 1));
     bitClear(aux_bf, 3);
   }
   if (WiFi.isConnected()) mqttReconnectTimer.once(2, connectToMqtt);
@@ -42,9 +42,9 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   byte id = client->id();
   if (type == WS_EVT_CONNECT) {
     ws_working++;
-    //DEBUG_PRINT("Установлено Websocket-соединение с ID = %i\n", id);
+    DEBUG_PRINT("Установлено Websocket-соединение с ID = %i\n", id);
   } else if (type == WS_EVT_DISCONNECT) {
-    //DEBUG_PRINT("Разорвано Websocket-соединение с ID = %i\n", id);
+    DEBUG_PRINT("Разорвано Websocket-соединение с ID = %i\n", id);
     ws.close(id);
     if (ws_working != 0) ws_working--;
   }
