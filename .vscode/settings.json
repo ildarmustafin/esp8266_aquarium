@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "functional": "cpp",
+        "array": "cpp",
+        "string": "cpp"
+    },
+    "platformio-ide.useDevelopmentPIOCore": true
+}

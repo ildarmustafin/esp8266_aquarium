@@ -84,13 +84,13 @@ void line_show()
 {
   if (!isUpdating)
   {
-    char led_bright_char[5];
-    snprintf(led_bright_char, 5, "%d", led_bright);
-    snprintf(line1, 17, "%02d:%02d %s %-7s", lcd_hour, lcd_min, weekLang, temp_char);
-    if (wifi.working)
+
+    snprintf(state.led_char, 5, "%d", state.led);
+    snprintf(line1, 17, "%02d:%02d %s %-7s", lcd_hour, lcd_min, weekLang, option.tempC_char);
+    if (state.wifi)
     {
-      snprintf(line2, 12, "\1%-5d\3%-5s", wifi.rssi, led_bright_char);
-      //snprintf(line2, 12, "\1%-5d\3%-5s", ESP.getHeapFragmentation(), led_bright_char);
+      snprintf(line2, 12, "\1%-5d\3%-5s", wifi.rssi, state.led_char);
+      //snprintf(line2, 12, "\1%-5d\3%-5s", ESP.getHeapFragmentation(), state.led_char);
       switch (bf_rel)
       { // Знак Реле1_2
       case 0:
@@ -109,10 +109,10 @@ void line_show()
         updateZnak(8, 1, 11, 1);
         break;
       }
-      updateZnak(4, bitRead(bf, 5), 12, 1);   // Знак FAN
-      updateZnak(5, bitRead(bf, 4), 13, 1);   // Знак TEN
-      updateZnak("Q", bitRead(bf, 1), 14, 1); // Знак MQTT
-      updateZnak(6, ws_working, 15, 1);       // Знак WEBSOCKET
+      updateZnak(4, state.fan, 12, 1);   // Знак FAN
+      updateZnak(5, state.ten, 13, 1);   // Знак TEN
+      updateZnak("Q", state.mqtt, 14, 1); // Знак MQTT
+      updateZnak(6, state.ws, 15, 1);       // Знак WEBSOCKET
     }
     printLCD(2, line1, line2);
   }
