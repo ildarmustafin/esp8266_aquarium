@@ -67,3 +67,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 [stars_path]:    https://github.com/ildarmustafin/esp8266_aquarium/stargazers
 [issues_svg]:    https://img.shields.io/github/issues/ildarmustafin/esp8266_aquarium.svg
 [issues_path]:   https://github.com/ildarmustafin/esp8266_aquarium/issues/
+<<<<<<< HEAD
+=======
+
+>>>>>>> b503237e9353da6f29c195e1879bbcfdc3fc9ac9
