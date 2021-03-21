@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
-#include <ESP8266WiFi.h>       // Standart ESP8266 2.7.3, NOT 2.7.4
-#include <Ticker.h>            // Standart ESP8266 2.7.3, NOT 2.7.4
+#include <ESP8266WiFi.h>
+#include <Ticker.h>
 #include <ESPAsyncTCP.h>       // https://github.com/me-no-dev/ESPAsyncTCP
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
 #include <AsyncMqttClient.h>   // https://github.com/marvinroger/async-mqtt-client
 #include <ArduinoJson.h>       // v.6.17.2
-#include <LittleFS.h>          // Standart ESP8266 2.7.3, NOT 2.7.4
-#include <FS.h>                // Standart ESP8266 2.7.3, NOT 2.7.4
+#include <LittleFS.h>
+#include <FS.h>
 #include <LiquidCrystal_I2C.h> // https://github.com/fdebrabander/Arduino-LiquidCrystal-I2C-library
 #include <DallasTemperature.h> // v.3.9.0
 #include <Hash.h>
@@ -57,7 +57,7 @@ const int BUTPIN = 14;
 
 struct ver_t
 {
-  char fw[6] = "5.4";
+  char fw[6] = "6.1";
   char fs[6] = "-.-";
 } ver;
 struct wifi_t
