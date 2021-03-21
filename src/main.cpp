@@ -144,25 +144,23 @@ void send_data()
   else
   {
     measure_datetime();
-    if (mqttClient.connected())
-      mqttClient.publish(mqtt.topic, 0, true, sendJson());
-    //mqttClient.publish(mqtt.topic, 0, true, configLive);
-
     if (state.wifi == 1)
       wifi.rssi = WiFi.RSSI();
     flag.inc++;
     if (flag.inc >= 60)
     {
-      oldState.rssi = sendOnChange("rssi", wifi.rssi, oldState.rssi);
+      oldState.rssi = sendOnChange("rssi", "rssi", wifi.rssi, oldState.rssi);
       flag.inc = 0;
     }
     if (oldState.tempC != option.tempC && !isUpdating)
     {
       //SERIAL_PRINT("[SSE] tempC: %2.1f\n", option.tempC);
       events.send(option.tempC_char, "temp", millis());
+      if (mqttClient.connected())
+        mqttClient.publish(mqtt.t_temp, 0, true, option.tempC_char);
       oldState.tempC = option.tempC;
     }
-    oldState.led = sendOnChange("led", state.led, oldState.led);
+    oldState.led = sendOnChange("led", mqtt.t_led, state.led, oldState.led);
     if (state.ws)
       ws.textAll(sendJson());
     //ws.textAll(configLive);
@@ -211,6 +209,10 @@ void setup()
   rtc.begin();
   timer_sendData.attach(1, send_data);
   mqttClient.setServer(mqtt.server_ip, mqtt.port);
+  if (strcmp(mqtt.server, ""))
+    mqttClient.connect();
+  else
+    mqttClient.disconnect();
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
   pwmController.resetDevices();
@@ -223,10 +225,4 @@ void loop()
 {
   ws.cleanupClients();
   ArduinoOTA.handle();
-  if (isUpdating)
-  {
-    //detachInterrupt(BUTPIN);
-    mqttClient.disconnect();
-    wifi_search.detach();
-  }
 }

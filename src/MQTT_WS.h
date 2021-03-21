@@ -1,8 +1,11 @@
-byte sendOnChange(const char *key, int state, int state_old)
+byte sendOnChange(const char *key, const char *keyMQTT, int state, int state_old)
 {
   if (state != state_old && !isUpdating)
-    //SERIAL_PRINT("[SSE] %s: %i\n", key, state);
+  {
     events.send(String(state).c_str(), key, millis());
+    if (mqttClient.connected() && strcmp(keyMQTT, ""))
+      mqttClient.publish(keyMQTT, 0, true, String(state).c_str());
+  }
   return state;
 }
 const char *sendJson()
@@ -27,31 +30,26 @@ const char *sendJson()
 }
 void connectToMqtt()
 {
-  mqttClient.connect();
+  if (!isUpdating)
+    mqttClient.connect();
 }
 void onMqttConnect(bool sessionPresent)
 {
   state.mqtt = 1;
-  if (!isUpdating)
-    events.send(String(state.mqtt).c_str(), "mqtt", millis());
-  if (!flag.mqtt && state.mqtt) //mqttFlag И mqttConnected
-  {
-    SERIAL_PRINT("[MQTT] Установлено MQTT-соединение!: %i\n", state.mqtt);
-    flag.mqtt = 1;
-  }
+  mqttReconnectTimer.detach();
+  oldState.mqtt = sendOnChange("mqtt", "", state.mqtt, oldState.mqtt);
+  mqttClient.publish(mqtt.t_all, 0, true, sendJson());
+  SERIAL_PRINT("[MQTT] Установлено MQTT-соединение!: %i\n", state.mqtt);
 }
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 {
   state.mqtt = 0;
-  if (!isUpdating)
-    events.send(String(state.mqtt).c_str(), "mqtt", millis());
-  if (flag.mqtt && !state.mqtt)
+  oldState.mqtt = sendOnChange("mqtt", "", state.mqtt, oldState.mqtt);
+  if (strcmp(mqtt.server, ""))
   {
     SERIAL_PRINT("[MQTT] MQTT-соединение разорвано!: %i\n", state.mqtt);
-    flag.mqtt = 0;
+    mqttReconnectTimer.attach(3, connectToMqtt);
   }
-  if (WiFi.isConnected())
-    mqttReconnectTimer.once(2, connectToMqtt);
 }
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
 {

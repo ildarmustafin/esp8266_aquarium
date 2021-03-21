@@ -81,7 +81,14 @@ struct mqtt_t
   char server[16] = "192.168.4.1";
   char user[12];
   char password[12];
-  char topic[12] = "all";
+  char t_all[10] = "all";
+  char t_temp[10] = "temp";
+  char t_led[10] = "led";
+  char t_fan[10] = "fan";
+  char t_ten[10] = "ten";
+  char t_rel1[10] = "rel1";
+  char t_rel2[10] = "rel2";          
+  char t_date[10] = "date";  
   char ID[12] = "esp_aqua";
   IPAddress server_ip;
 } mqtt;
@@ -114,6 +121,7 @@ struct oldState_t
   uint8_t fan = 0;
   uint8_t ten = 0;
   uint8_t led = 0;
+  uint8_t mqtt = 0;  
   uint8_t valNow = 0;
   uint8_t perc = 0;    
   int8_t rssi = 0;
@@ -142,7 +150,6 @@ struct state_t
 struct flag_t
 {
   uint8_t chart = 1;
-  uint8_t mqtt = 0;
   uint8_t inter = 0;
   uint8_t inc = 0;
   char ip_type[7];

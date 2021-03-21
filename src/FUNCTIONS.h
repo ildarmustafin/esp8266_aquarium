@@ -18,16 +18,14 @@ void readJsonValues()
   strcpy(mqtt.ID, root["input"][2][2].as<const char *>());       
   strcpy(mqtt.user, root["input"][2][3].as<const char *>());     
   strcpy(mqtt.password, root["input"][2][4].as<const char *>()); 
-  strcpy(mqtt.topic, root["input"][2][5].as<const char *>());    
-
-  if (!strcmp(mqtt.server, ""))
-    strcpy(mqtt.server, "192.168.4.1");
-  if (mqtt.port == 0)
-    mqtt.port = 1883;
-  if (!strcmp(mqtt.ID, ""))
-    strcpy(mqtt.ID, "esp_aqua");
-  if (!strcmp(mqtt.topic, ""))
-    strcpy(mqtt.topic, "all");
+  strcpy(mqtt.t_all, root["input"][2][5].as<const char *>());    
+  strcpy(mqtt.t_temp, root["input"][2][6].as<const char *>());    
+  strcpy(mqtt.t_led, root["input"][2][7].as<const char *>());  
+  strcpy(mqtt.t_fan, root["input"][2][8].as<const char *>());  
+  strcpy(mqtt.t_ten, root["input"][2][9].as<const char *>());  
+  strcpy(mqtt.t_rel1, root["input"][2][10].as<const char *>());  
+  strcpy(mqtt.t_rel2, root["input"][2][11].as<const char *>());  
+  strcpy(mqtt.t_date, root["input"][2][12].as<const char *>());            
   option.temp_koef = root["input"][1][0].as<float>();
   option.max_d_perc = root["input"][1][1].as<signed int>();
   option.max_n_perc = root["input"][1][2].as<signed int>();
@@ -173,8 +171,8 @@ void relay_schedule()
 
     state.rel1 = rele_function(sec_0, sec_1, s_mode_r1); //определение состояния rel1 с инверсией
     state.rel2 = rele_function(sec_2, sec_3, s_mode_r2); //определение состояния rel2 с инверсией
-    oldState.rel1 = sendOnChange("rel1", state.rel1, oldState.rel1);
-    oldState.rel2 = sendOnChange("rel2", state.rel2, oldState.rel2);
+    oldState.rel1 = sendOnChange("rel1", mqtt.t_rel1, state.rel1, oldState.rel1);
+    oldState.rel2 = sendOnChange("rel2", mqtt.t_rel2, state.rel2, oldState.rel2);
     bitWrite(bf_rel, 0, state.rel1);                        //Запись бит в bf_rel для вывода символа на LCD1602
     bitWrite(bf_rel, 1, state.rel2);                        //Запись бит в bf_rel для вывода символа на LCD1602
     byte PWMrel1 = (state.inv) ? !state.rel1 : state.rel1;  //Определение наличия инверсии
@@ -204,13 +202,13 @@ void update_chart_values()
 void temp_fan_regulation(float t)
 {
   state.fan = (state.inv) ? !fan_reg.getResult() : fan_reg.getResult();
-  oldState.fan = sendOnChange("fan", fan_reg.getResult(), oldState.fan);
+  oldState.fan = sendOnChange("fan", mqtt.t_fan, fan_reg.getResult(), oldState.fan);
   pwmController.setChannelPWM(FANPIN, state.fan * 4096);
 }
 void temp_ten_regulation(float t)
 {
   state.ten = (state.inv) ? !ten_reg.getResult() : ten_reg.getResult();
-  oldState.ten = sendOnChange("ten", ten_reg.getResult(), oldState.ten);
+  oldState.ten = sendOnChange("ten", mqtt.t_ten, ten_reg.getResult(), oldState.ten);
   pwmController.setChannelPWM(TENPIN, state.ten * 4096);
 }
 void initOTA()

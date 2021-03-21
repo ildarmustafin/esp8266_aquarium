@@ -157,31 +157,42 @@ void initFileSystem(void)
   });
   server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     mqttClient.disconnect();
-    strcpy(mqtt.server, request->arg("input[2][0]").c_str());   //16
-    strcpy(mqtt.ID, request->arg("input[2][2]").c_str());       //12
-    strcpy(mqtt.user, request->arg("input[2][3]").c_str());     //12
-    strcpy(mqtt.password, request->arg("input[2][4]").c_str()); //12
-    strcpy(mqtt.topic, request->arg("input[2][5]").c_str());    //12
+    strcpy(mqtt.server, request->arg("input[2][0]").c_str());
+    strcpy(mqtt.ID, request->arg("input[2][2]").c_str());
+    strcpy(mqtt.user, request->arg("input[2][3]").c_str());
+    strcpy(mqtt.password, request->arg("input[2][4]").c_str());
+    strcpy(mqtt.t_all, request->arg("input[2][5]").c_str());
+    strcpy(mqtt.t_temp, request->arg("input[2][6]").c_str());
+    strcpy(mqtt.t_led, request->arg("input[2][7]").c_str());
+    strcpy(mqtt.t_fan, request->arg("input[2][8]").c_str());
+    strcpy(mqtt.t_ten, request->arg("input[2][9]").c_str());
+    strcpy(mqtt.t_rel1, request->arg("input[2][10]").c_str());
+    strcpy(mqtt.t_rel2, request->arg("input[2][11]").c_str());
+    strcpy(mqtt.t_date, request->arg("input[2][12]").c_str());
     mqtt.port = request->arg("input[2][1]").toInt();
     mqtt.server_ip.fromString(mqtt.server);
-    if (strcmp(mqtt.server, "") || mqtt.port != 0 || strcmp(mqtt.topic, "") || strcmp(mqtt.ID, ""))
+    if (strcmp(mqtt.server, ""))
     {
       mqttClient.setServer(mqtt.server_ip, mqtt.port);
-      //mqttClient.connect();
-      //timer_mqtt.attach(1, send_mqtt);
+      mqttClient.connect();
     }
     else
     {
-      //mqttClient.disconnect();
-      //timer_mqtt.detach();
-      //bitClear(bf, 1);
+      mqttClient.disconnect();
     }
     jsonWrite(configSetup, "input", 2, 0, mqtt.server);
     jsonWrite(configSetup, "input", 2, 1, mqtt.port);
     jsonWrite(configSetup, "input", 2, 2, mqtt.ID);
     jsonWrite(configSetup, "input", 2, 3, mqtt.user);
     jsonWrite(configSetup, "input", 2, 4, mqtt.password);
-    jsonWrite(configSetup, "input", 2, 5, mqtt.topic);
+    jsonWrite(configSetup, "input", 2, 5, mqtt.t_all);
+    jsonWrite(configSetup, "input", 2, 6, mqtt.t_temp);
+    jsonWrite(configSetup, "input", 2, 7, mqtt.t_led);
+    jsonWrite(configSetup, "input", 2, 8, mqtt.t_fan);
+    jsonWrite(configSetup, "input", 2, 9, mqtt.t_ten);
+    jsonWrite(configSetup, "input", 2, 10, mqtt.t_rel1);
+    jsonWrite(configSetup, "input", 2, 11, mqtt.t_rel2);
+    jsonWrite(configSetup, "input", 2, 12, mqtt.t_date);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "[GET] OK");
     SERIAL_PRINT("[FILESYSTEM] SAVE MQTT: OK\n");
@@ -223,8 +234,8 @@ void initFileSystem(void)
     {
       //detachInterrupt(BUTPIN);
       isUpdating = true;
-      //timer_sendData.detach();
-      //mqttClient.disconnect();
+      mqttClient.disconnect();
+      wifi_search.detach();
       content_len = request->contentLength();
       cmd = (filename.indexOf("spiffs") > -1 || filename.indexOf("littlefs") > -1) ? 100 : 0; //U_FS : U_FLASH;
       fsSize = ((size_t)&_FS_end - (size_t)&_FS_start);
