@@ -1,7 +1,7 @@
 void WiFi_initAP_STA()
 {
-  snprintf(line2, 16, "   CREATE AP!   ");
-  SERIAL_PRINT("[WIFI] INIT AP MODE\n");
+  snprintf(line2, 16, PSTR("   CREATE AP!   "));
+  Serial.println(F("[WIFI] INIT AP MODE")); //7 byte   
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
   WiFi.mode(WIFI_AP_STA);
@@ -11,7 +11,7 @@ void WiFi_initAP_STA()
 }
 void WiFi_initSTA()
 {
-  SERIAL_PRINT("[WIFI] INIT STA MODE\n");
+  Serial.println(F("[WIFI] INIT STA MODE"));  //8 byte
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
   WiFi.mode(WIFI_STA);
@@ -31,12 +31,14 @@ void WiFi_initSTA()
 }
 void printScanResult(int networksFound)
 {
-  DEBUG_PRINT("[WIFI] SEARCHING\n");
+  //Serial.print("[WIFI] SEARCHING\n");
   for (int i = 0; i < networksFound; i++)
   {
     if (WiFi.SSID(i) == wifi.ssid)
     {
-      SERIAL_PRINT("\n[WIFI] FOUND \"%s\"\n[WIFI] CONNECTING...PLEASE WAIT...\n", WiFi.SSID(i).c_str());
+      Serial.print(F("[WIFI] FOUND "));
+      Serial.println(WiFi.SSID(i));
+      Serial.println(F("[WIFI] CONNECTING...PLEASE WAIT..."));
       WiFi_initSTA();
     }
   }
@@ -47,8 +49,9 @@ void search_wifi()
 }
 void onStationConnected(const WiFiEventStationModeConnected &evt)
 {
-  SERIAL_PRINT("[WIFI] STATION CONNECTED TO: %s\n", evt.ssid.c_str());
-  snprintf(line2, 16, "CONNECT TO WIFI!");
+  Serial.print(F("[WIFI] STATION CONNECTED TO: "));
+  Serial.println(evt.ssid);  
+  snprintf(line2, 16, PSTR("CONNECT TO WIFI!"));
   wifi_search.detach();
   state.wifi = 1;
 }
@@ -58,7 +61,8 @@ void onStationDisconnected(const WiFiEventStationModeDisconnected &evt)
   state.wifi = 0;
   if (--wifi.countDS)
   {
-    SERIAL_PRINT("[WIFI] CONNECTING...TRY:%i\n", wifi.countDS);
+    Serial.print(F("[WIFI] CONNECTING...TRY:"));
+    Serial.println(wifi.countDS);    
     lcd.createChar(1, z_wifi_tc);
     snprintf(line2, 16, "CONNECTING...:%i", wifi.countDS);
   }
@@ -74,15 +78,17 @@ void onStationGotIp(const WiFiEventStationModeGotIP &evt)
   //wifi.rssi = WiFi.RSSI();
   lcd.createChar(1, z_wifi_sta);
   if (strcmp(wifi.ip_str, "") && strcmp(wifi.ip_gw_str, ""))
-    strcpy(flag.ip_type, "STATIC");
+    strcpy(flag.ip_type, PSTR("STATIC"));
   else
-    strcpy(flag.ip_type, "DHCP");
-  SERIAL_PRINT("[WIFI] STATION GOT IP [%s]: %s\n", flag.ip_type, evt.ip.toString().c_str());
+    strcpy(flag.ip_type, PSTR("DHCP"));
+  Serial.print(F("[WIFI] STATION GOT IP ["));
+  Serial.print(flag.ip_type);
+  Serial.println(PSTR("]: ") + evt.ip.toString());
   state.wifi = 1;
 }
 void onProbeRequestReceive(const WiFiEventSoftAPModeProbeRequestReceived &evt)
 {
-  //SERIAL_PRINT("CREATE AP\n");
+  //Serial.print("CREATE AP\n");
   lcd.createChar(1, z_wifi_ap);
   wifi.rssi = evt.rssi;
   state.wifi = 2;

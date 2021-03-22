@@ -3,11 +3,11 @@ void initFileSystem(void)
   LittleFS.begin();
   if (!LittleFS.exists("/configSetup.json"))
   {
-    SERIAL_PRINT("\nERROR OPENING LittleFS\n");
+    Serial.println(F("ERROR OPENING LittleFS"));
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
       request->send_P(200, "text/html", upload_spiffs);
     });
-    printLCD(2, " ERROR OPENING  ", "     SPIFFS     ");
+    printLCD(2, PSTR(" ERROR OPENING  "), PSTR("     SPIFFS     "));
   }
   else
   {
@@ -35,7 +35,7 @@ void initFileSystem(void)
     jsonWrite(configSetup, "defaultLang", defLang);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "OK");
-    SERIAL_PRINT("[FILESYSTEM] LANG CHANGE: OK\n");
+    Serial.println(F("[FILESYSTEM] LANG CHANGE: OK"));
   });
   server.on("/save_schedule", HTTP_GET, [](AsyncWebServerRequest *request) {
     byte selIndex = request->arg("selIndex").toInt();
@@ -58,7 +58,7 @@ void initFileSystem(void)
     saveConfig("/configSetup.json", configSetup);
     printLCD(1, "", " SAVE SCHEDULE  ");
     request->send(200, "text/plain", "[GET] OK");
-    SERIAL_PRINT("[FILESYSTEM] SAVE SCHEDULE: OK\n");
+    Serial.println(F("[FILESYSTEM] SAVE SCHEDULE: OK"));
   });
   server.on("/save_date", HTTP_GET, [](AsyncWebServerRequest *request) {
     String date_man = request->arg("input[3][0]");
@@ -74,13 +74,16 @@ void initFileSystem(void)
       printLCD(1, "", " MANUAL PRESSED ");
       events.send(rtc.now().timestamp().c_str(), "now", millis());
       request->send(200, "text/plain", "[GET] OK");
-      SERIAL_PRINT("[FILESYSTEM] Manual button pressed \n[FILESYSTEM] Entered time: %02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
+      Serial.println(F("[FILESYSTEM] Manual button pressed"));
+      Serial.print(F("[FILESYSTEM] Entered time: "));
+      //Serial.print(ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
     }
     else
     {
       printLCD(2, "  NO INTERNET   ", "   CONNECTION   ");
       request->send(400, "text/plain", "[GET] ERROR");
-      SERIAL_PRINT("[FILESYSTEM] No internet. now.isValid: %i\n", state.valNow);
+      Serial.print(F("[FILESYSTEM] No internet. now.isValid: "));
+      Serial.println(state.valNow);
     }
   });
   server.on("/auto_sync", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -92,7 +95,8 @@ void initFileSystem(void)
     {
       printLCD(2, "  NO INTERNET   ", "   CONNECTION   ");
       request->send(400, "text/plain", "[GET] NO INTERNET CONNECTION");
-      SERIAL_PRINT("[FILESYSTEM] No internet. isSyncOK: %i\n", state.valSync);
+      Serial.print(F("[FILESYSTEM] No internet. isSyncOK: "));
+      Serial.println(state.valSync);
     }
     else
     {
@@ -100,8 +104,11 @@ void initFileSystem(void)
       printLCD(1, "", "AUTOSYNC PRESSED");
       events.send(rtc.now().timestamp().c_str(), "now", millis());
       request->send(200, "text/plain", "[GET] OK");
-      SERIAL_PRINT("[FILESYSTEM] Internet OK. isSyncOK: %i\n", state.valSync);
-      SERIAL_PRINT("[FILESYSTEM] Autosync button pressed \n[FILESYSTEM] NTP time now: %02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
+      Serial.print(F("[FILESYSTEM] Internet OK. isSyncOK: ")); 
+      Serial.println(state.valSync);
+      Serial.println(F("[FILESYSTEM] Autosync button pressed"));
+      Serial.print(F("[FILESYSTEM] NTP time now: "));
+      //Serial.print(%02d.%02d.%02i | %02d:%02d:%02d\n", ntp.day, ntp.month, ntp.year, ntp.hour, ntp.min, ntp.sec);
     }
   });
   server.on("/save", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -135,14 +142,14 @@ void initFileSystem(void)
     saveConfig("/configSetup.json", configSetup);
     printLCD(1, "", "  SAVE OPTIONS  ");
     request->send(200, "text/plain", "[GET] OK");
-    SERIAL_PRINT("[FILESYSTEM] SAVE TRANSMITTERS: OK\n");
+    Serial.println(F("[FILESYSTEM] SAVE TRANSMITTERS: OK"));
   });
   server.on("/chartDays", HTTP_GET, [](AsyncWebServerRequest *request) {
     byte chartDays = request->arg("input[0][0]").toInt();
     jsonWrite(configSetup, "input", 0, 0, chartDays);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "[GET] OK");
-    SERIAL_PRINT("[FILESYSTEM] SAVE CHART DAYS: OK\n");
+    Serial.println(F("[FILESYSTEM] SAVE CHART DAYS: OK"));
   });
   server.on("/s_mode", HTTP_GET, [](AsyncWebServerRequest *request) {
     s_mode_led = request->arg("s_mode[0]").toInt();
@@ -153,7 +160,7 @@ void initFileSystem(void)
     jsonWrite(configSetup, "s_mode", 2, s_mode_r2);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "[GET] OK");
-    SERIAL_PRINT("[FILESYSTEM] SAVE S_MODE: OK\n");
+    Serial.println(F("[FILESYSTEM] SAVE S_MODE: OK"));
   });
   server.on("/mqtt", HTTP_GET, [](AsyncWebServerRequest *request) {
     mqttClient.disconnect();
@@ -195,13 +202,13 @@ void initFileSystem(void)
     jsonWrite(configSetup, "input", 2, 12, mqtt.t_date);
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "[GET] OK");
-    SERIAL_PRINT("[FILESYSTEM] SAVE MQTT: OK\n");
+    Serial.println(F("[FILESYSTEM] SAVE MQTT: OK"));
   });
   server.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
     String restart = request->arg("device");
     if (restart == "1")
     {
-      SERIAL_PRINT("[FILESYSTEM] RESTART: OK\n");
+      Serial.println(F("[FILESYSTEM] RESTART: OK"));
       request->send(200, "text/plain", "[GET] OK");
       timer_once.once(0.5, restart_esp);
     }
@@ -226,7 +233,7 @@ void initFileSystem(void)
     jsonWrite(configSetup, "input", 3, 9, wifi.port);       //web_port
     saveConfig("/configSetup.json", configSetup);
     request->send(200, "text/plain", "[GET] OK");
-    SERIAL_PRINT("[FILESYSTEM] SAVE WIFI: OK\n");
+    Serial.println(F("[FILESYSTEM] SAVE WIFI: OK"));
   });
   server.onFileUpload([](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final) {
     static byte cmd;
@@ -239,7 +246,7 @@ void initFileSystem(void)
       content_len = request->contentLength();
       cmd = (filename.indexOf("spiffs") > -1 || filename.indexOf("littlefs") > -1) ? 100 : 0; //U_FS : U_FLASH;
       fsSize = ((size_t)&_FS_end - (size_t)&_FS_start);
-      SERIAL_PRINT("\n[UPDATE] UPDATE TYPE: %s\n[UPDATE] FILENAME:    %s\n--UPLOAD_FILE_START--\n", (cmd) ? "FILESYSTEM" : "FIRMWARE", filename.c_str());
+      //Serial.print("\n[UPDATE] UPDATE TYPE: %s\n[UPDATE] FILENAME:    %s\n--UPLOAD_FILE_START--\n", (cmd) ? "FILESYSTEM" : "FIRMWARE", filename.c_str());
       Update.runAsync(true);
       if (!Update.begin((cmd) ? fsSize : content_len, cmd))
       {
@@ -262,7 +269,7 @@ void initFileSystem(void)
       lcd.setCursor(0, 0);
       lcd.print(line1);
       fillBar2(0, 1, 16, state.perc);
-      SERIAL_PRINT("[UPDATE] Writing: %i / %i bytes (%i %%)\n", Update.progress(), Update.size(), state.perc);
+      //Serial.print("[UPDATE] Writing: %i / %i bytes (%i %%)\n", Update.progress(), Update.size(), state.perc);
     }
     if (final)
     {
@@ -270,8 +277,8 @@ void initFileSystem(void)
       //ota_time.detach();
       if (Update.end(true))
       {
-        SERIAL_PRINT("--UPLOAD_FILE_END-- \n[UPDATE] UPDATE SUCCESS: %u\n", (cmd) ? fsSize : content_len);
-        SERIAL_PRINT("RESTARTING ESP8266. PLEASE WAIT...\n");
+        //Serial.print("--UPLOAD_FILE_END-- \n[UPDATE] UPDATE SUCCESS: %u\n", (cmd) ? fsSize : content_len);
+        Serial.println(F("RESTARTING ESP8266. PLEASE WAIT..."));
         printLCD(2, "   RESTARTING   ", "PLEASE WAIT...  ");
         delay(1000);
         request->send_P(200, "text/html", successResponse);
@@ -288,7 +295,8 @@ void initFileSystem(void)
   });
   events.onConnect([](AsyncEventSourceClient *client) {
     if (client->lastId())
-      SERIAL_PRINT("[SSE] reconnect! ID: %u\n", client->lastId());
+      Serial.print(F("[SSE] reconnect! ID: "));
+      Serial.println(client->lastId());
     if (!isUpdating)
     {
       //strcpy(configLive, sendJson());

@@ -80,8 +80,8 @@ void updateTimeNTP()
 }
 void restart_esp()
 {
-  SERIAL_PRINT("RESTARTING ESP8266. PLEASE WAIT...\n");
-  printLCD(2, "   RESTARTING   ", "PLEASE WAIT...  ");
+  Serial.println(F("RESTARTING ESP8266. PLEASE WAIT..."));
+  printLCD(2, PSTR("   RESTARTING   "), PSTR("PLEASE WAIT...  "));
   delay(2000);
   WiFi.mode(WIFI_OFF);
   WiFi.disconnect(true);
@@ -216,10 +216,11 @@ void initOTA()
   ArduinoOTA.setPort(8266);
   ArduinoOTA.onStart([]() {
     isUpdating = true;
-    SERIAL_PRINT("[OTA] Start OTA ");
+    Serial.println(F("[OTA] Start OTA"));
   });
   ArduinoOTA.onEnd([]() {
-    SERIAL_PRINT("\n[OTA] End OTA");
+    Serial.println();
+    Serial.println(F("[OTA] End OTA"));
     isUpdating = false;
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
@@ -230,21 +231,23 @@ void initOTA()
     lcd.setCursor(0, 0);
     lcd.print(line1);
     fillBar2(0, 1, 16, state.perc);
-    SERIAL_PRINT("[OTA] Progress: %u%%\r", (progress / (total / 100)));
+    Serial.print(F("[OTA] Progress: "));
+    Serial.print((progress / (total / 100)));
+    Serial.println(F(" %"));
   });
   ArduinoOTA.onError([](ota_error_t error) {
     isUpdating = false;
-    SERIAL_PRINT("[OTA] Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR)
-      SERIAL_PRINT("[OTA] Auth Failed");
-    else if (error == OTA_BEGIN_ERROR)
-      SERIAL_PRINT("[OTA] Begin Failed");
-    else if (error == OTA_CONNECT_ERROR)
-      SERIAL_PRINT("[OTA] Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR)
-      SERIAL_PRINT("[OTA] Receive Failed");
-    else if (error == OTA_END_ERROR)
-      SERIAL_PRINT("[OTA] End Failed");
+    //Serial.print("[OTA] Error[%u]: ", error);
+    //if (error == OTA_AUTH_ERROR)
+      //Serial.print("[OTA] Auth Failed");
+    //else if (error == OTA_BEGIN_ERROR)
+      //Serial.print("[OTA] Begin Failed");
+    //else if (error == OTA_CONNECT_ERROR)
+      //Serial.print("[OTA] Connect Failed");
+    //else if (error == OTA_RECEIVE_ERROR)
+      //Serial.print("[OTA] Receive Failed");
+    //else if (error == OTA_END_ERROR)
+      //Serial.print("[OTA] End Failed");
   });
   ArduinoOTA.begin();
 }

@@ -96,7 +96,10 @@ void saveConfig(String fileName, String strings) {
 }
 String readFile(String fileName, size_t len) {
   File configFile = LittleFS.open(fileName, "r");
-  SERIAL_PRINT("\nFile: %s | size: %i\n", fileName.c_str(), configFile.size());
+  Serial.print(F("File: "));
+  Serial.print(fileName);
+  Serial.print(F(" size: "));
+  Serial.println(configFile.size());
   String cSetup = configFile.readString();
   configFile.close();
   return cSetup;

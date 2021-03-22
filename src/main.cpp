@@ -14,7 +14,10 @@ void readDateTime()
   {
     if (state.valNow != oldState.valNow)
     {
-      SERIAL_PRINT("[%s]: %2.1fC | LED_value:%i\n", rtc.now().timestamp().c_str(), option.tempC, LED_value);
+      Serial.print(F("----.--.-- --:--:--]: Temp: "));
+      Serial.print(option.tempC);
+      Serial.print(F(" | LED_value: "));
+      Serial.println(LED_value);
       oldState.valNow = state.valNow;
     }
     if (date_error < 10)
@@ -68,7 +71,13 @@ void readTemp()
   {
     if (t != option.t_old)
     {
-      SERIAL_PRINT("[%s]: Temp:%2.1fC\n", rtc.now().timestamp().c_str(), t);
+      Serial.print(F("["));
+      if (!state.valNow)
+        Serial.print(F("----.--.-- --:--:--"));
+      else
+        Serial.print(rtc.now().timestamp());
+      Serial.print(F("]: Temp: "));
+      Serial.println(t);
       option.t_old = t;
     }
     if (temp_error < waitForTemp)
@@ -108,17 +117,20 @@ void measure_datetime()
     events.send(String(state.heapMin).c_str(), "heap", millis());
     oldState.heapMin = state.heapMin;
   }
-  //DEBUG_PRINT("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), heapCur, heapMin);
-  //SERIAL_PRINT("heapCur: %i | heapMin: %i | wifi: %i\n", state.heapCur, state.heapMin, state.wifi);
-  //DEBUG_PRINT("line1: %s\n", line1);
-  //DEBUG_PRINT("line2: %s\n", line2);
-  //DEBUG_PRINT("state.wifi: %i\n", state.wifi);
+  //Serial.print("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), heapCur, heapMin);
+  Serial.print(F("heapCur: "));
+  Serial.print(state.heapCur);
+  Serial.print(F(" heapMin: "));
+  Serial.println(state.heapMin);
+  //Serial.print("line1: %s\n", line1);
+  //Serial.print("line2: %s\n", line2);
+  //Serial.print("state.wifi: %i\n", state.wifi);
   line_show();
 }
 void noLight()
 {
   lcd.noBacklight();
-  SERIAL_PRINT("BUTTON FINISH: %i\n", option.delLed);
+  //Serial.print("BUTTON FINISH: %i\n", option.delLed);
   flag.inter = 0;
 }
 void inputButton()
@@ -126,7 +138,7 @@ void inputButton()
   if ((!flag.inter) && (option.delLed))
   {
     lcd.backlight();
-    SERIAL_PRINT("BUTTON START: %i\n", option.delLed);
+    //Serial.print("BUTTON START: %i\n", option.delLed);
     timer_once.once(option.delLed, noLight);
     flag.inter = 1;
   }
@@ -154,7 +166,7 @@ void send_data()
     }
     if (oldState.tempC != option.tempC && !isUpdating)
     {
-      //SERIAL_PRINT("[SSE] tempC: %2.1f\n", option.tempC);
+      //Serial.print("[SSE] tempC: %2.1f\n", option.tempC);
       events.send(option.tempC_char, "temp", millis());
       if (mqttClient.connected())
         mqttClient.publish(mqtt.t_temp, 0, true, option.tempC_char);
@@ -168,20 +180,14 @@ void send_data()
 }
 void setup()
 {
-#ifdef SERIAL_ON
   Serial.begin(115200);
   Serial.println();
-#endif
-#ifdef DEBUG_ON
-  Serial.begin(115200);
-  Serial.println();
-#endif
   pinMode(BUTPIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTPIN), inputButton, CHANGE);
   initLCD();
   initOTA();
   initFileSystem();
-  DEBUG_PRINT("[SETUP] INITIAL PIN STATES: %i\n", state.inv * 4096);
+  //Serial.print("[SETUP] INITIAL PIN STATES: %i\n", state.inv * 4096);
   pwmController.setChannelPWM(FANPIN, state.inv * 4096);
   pwmController.setChannelPWM(TENPIN, state.inv * 4096);
   pwmController.setChannelPWM(RELAY1PIN, state.inv * 4096);
@@ -218,7 +224,7 @@ void setup()
   pwmController.resetDevices();
   pwmController.init();
   pwmController.setPWMFrequency(1500);
-  //SERIAL_PRINT(pwmController.getChannelPWM(0));
+  //Serial.print(pwmController.getChannelPWM(0));
 }
 
 void loop()

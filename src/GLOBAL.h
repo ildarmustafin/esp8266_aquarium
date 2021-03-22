@@ -26,6 +26,9 @@ extern "C"
 {
 #include "user_interface.h"
 }
+//#define PROGMEM   ICACHE_RODATA_ATTR
+//#define ICACHE_RODATA_ATTR  __attribute__((section(".irom.text")))
+
 const int BUTPIN = 14;
 
 #define SCL 5        //D1 GPIO5   SCL
@@ -39,22 +42,6 @@ const int BUTPIN = 14;
 #define recTime 4
 #define waitForTemp 10
 #define waitForDisplay 3
-
-#define SERIAL_ON
-//#define DEBUG_ON
-
-#ifdef DEBUG_ON
-#define DEBUG_PRINT(...) Serial.printf(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...)
-#endif
-
-#ifdef SERIAL_ON
-#define SERIAL_PRINT(...) Serial.printf(__VA_ARGS__)
-#else
-#define SERIAL_PRINT(...)
-#endif
-
 struct ver_t
 {
   char fw[6] = "6.1";

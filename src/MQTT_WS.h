@@ -39,7 +39,8 @@ void onMqttConnect(bool sessionPresent)
   mqttReconnectTimer.detach();
   oldState.mqtt = sendOnChange("mqtt", "", state.mqtt, oldState.mqtt);
   mqttClient.publish(mqtt.t_all, 0, true, sendJson());
-  SERIAL_PRINT("[MQTT] Установлено MQTT-соединение!: %i\n", state.mqtt);
+  Serial.print(F("[MQTT] Установлено MQTT-соединение!: "));
+  Serial.println(state.mqtt);  
 }
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 {
@@ -47,7 +48,8 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
   oldState.mqtt = sendOnChange("mqtt", "", state.mqtt, oldState.mqtt);
   if (strcmp(mqtt.server, ""))
   {
-    SERIAL_PRINT("[MQTT] MQTT-соединение разорвано!: %i\n", state.mqtt);
+    Serial.print(F("[MQTT] MQTT-соединение разорвано!:"));
+    Serial.println(state.mqtt);
     mqttReconnectTimer.attach(3, connectToMqtt);
   }
 }
@@ -59,11 +61,13 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     state.ws++;
     if (!isUpdating)
       events.send(String(state.ws).c_str(), "ws", millis());
-    SERIAL_PRINT("[WS] Установлено Websocket-соединение с ID = %i\n", id);
+    Serial.print(F("[WS] Установлено Websocket-соединение с ID = "));
+    Serial.println(id);    
   }
   else if (type == WS_EVT_DISCONNECT)
   {
-    SERIAL_PRINT("[WS] Разорвано Websocket-соединение с ID = %i\n", id);
+    Serial.print(F("[WS] Разорвано Websocket-соединение с ID = "));
+    Serial.println(id);
     ws.close(id);
     if (state.ws != 0 && !isUpdating)
     {
