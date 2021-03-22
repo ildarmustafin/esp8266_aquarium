@@ -118,10 +118,10 @@ void measure_datetime()
     oldState.heapMin = state.heapMin;
   }
   //Serial.print("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), heapCur, heapMin);
-  Serial.print(F("heapCur: "));
-  Serial.print(state.heapCur);
-  Serial.print(F(" heapMin: "));
-  Serial.println(state.heapMin);
+  //Serial.print(F("heapCur: "));
+  //Serial.print(state.heapCur);
+  //Serial.print(F(" heapMin: "));
+  //Serial.println(state.heapMin);
   //Serial.print("line1: %s\n", line1);
   //Serial.print("line2: %s\n", line2);
   //Serial.print("state.wifi: %i\n", state.wifi);
