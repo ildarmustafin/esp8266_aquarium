@@ -69,7 +69,7 @@ extern int IPPIN;
 
 struct ver_t
 {
-  char fw[6] = "7.1";
+  char fw[6] = "6.2";
   char fs[6] = "-.-";
 };
 struct wifi_t
