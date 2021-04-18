@@ -1,12 +1,7 @@
-#include "GLOBAL.h"
-#include "LCD.h"
-#include "WIFI.h"
-#include "MQTT_WS.h"
-#include "JSON.h"
-#include "FUNCTIONS.h"
-#include "FILESYSTEM.h"
+#include "main.h"
 
 void ICACHE_RAM_ATTR inputButton();
+void ICACHE_RAM_ATTR ipButton();
 void readDateTime()
 {
   state.valNow = rtc.now().isValid();
@@ -28,6 +23,7 @@ void readDateTime()
     {
       lcd_hour = 0;
       lcd_min = 0;
+      lcd_sec = 0;      
       state.led = 0;
       state.rel1 = 0;
       state.rel2 = 0;
@@ -57,6 +53,7 @@ void readDateTime()
     }
     lcd_hour = rtc.now().hour();
     lcd_min = rtc.now().minute();
+    lcd_sec = rtc.now().second();    
     led_schedule();
     relay_schedule();
     update_chart_values();
@@ -117,11 +114,9 @@ void measure_datetime()
     events.send(String(state.heapMin).c_str(), "heap", millis());
     oldState.heapMin = state.heapMin;
   }
-  //Serial.print("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), heapCur, heapMin);
-  //Serial.print(F("heapCur: "));
-  //Serial.print(state.heapCur);
-  //Serial.print(F(" heapMin: "));
-  //Serial.println(state.heapMin);
+  //Serial.printf("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), state.heapCur, state.heapMin);
+  Serial.print(F("heapMin: "));
+  Serial.println(state.heapMin);
   //Serial.print("line1: %s\n", line1);
   //Serial.print("line2: %s\n", line2);
   //Serial.print("state.wifi: %i\n", state.wifi);
@@ -130,17 +125,29 @@ void measure_datetime()
 void noLight()
 {
   lcd.noBacklight();
-  //Serial.print("BUTTON FINISH: %i\n", option.delLed);
-  flag.inter = 0;
+  //Serial.printf("BUTTON FINISH: %i\n", option.delLed);
+  flag.buttonPressed = 0;
+}
+void showIP()
+{
+  flag.ipPressed = 0;
 }
 void inputButton()
 {
-  if ((!flag.inter) && (option.delLed))
+  if ((!flag.buttonPressed) && (option.delLed))
   {
     lcd.backlight();
-    //Serial.print("BUTTON START: %i\n", option.delLed);
+    //Serial.printf("BUTTON START: %i\n", option.delLed);
     timer_once.once(option.delLed, noLight);
-    flag.inter = 1;
+    flag.buttonPressed = 1;
+  }
+}
+void ipButton()
+{
+  if (!flag.ipPressed)
+  {
+    timerIP_once.once(3, showIP);
+    flag.ipPressed = 1;
   }
 }
 void send_data()
@@ -156,12 +163,14 @@ void send_data()
   else
   {
     measure_datetime();
+    pwmController.setChannelOn(DOP1LED);
     if (state.wifi == 1)
       wifi.rssi = WiFi.RSSI();
     flag.inc++;
     if (flag.inc >= 60)
     {
       oldState.rssi = sendOnChange("rssi", "rssi", wifi.rssi, oldState.rssi);
+      Serial.printf("[SSE] RSSI: %i\n", wifi.rssi);      
       flag.inc = 0;
     }
     if (oldState.tempC != option.tempC && !isUpdating)
@@ -176,14 +185,27 @@ void send_data()
     if (state.ws)
       ws.textAll(sendJson());
     //ws.textAll(configLive);
+    if (flag.serDebug)
+    {
+      if (str.indexOf("heap") > -1)
+        Serial.printf("FRAGM: %i | CUR: %i | MIN: %i\n", ESP.getHeapFragmentation(), state.heapCur, state.heapMin);
+      if (str.indexOf("led") > -1)
+        Serial.printf("LED: %i | REL1: %i | REL2: %i\n", state.led, state.rel1, state.rel2);
+      if (str.indexOf("temp") > -1)
+        Serial.printf("TEMP: %2.1f | FAN: %i | TEN: %i\n", option.tempC, state.fan, state.ten);
+      if (str.indexOf("wifi") > -1)
+        Serial.printf("MODE: %i | STATE: %i | RSSI: %i\n", WiFi.getMode(), state.wifi, wifi.rssi);
+    }
   }
 }
 void setup()
 {
   Serial.begin(115200);
   Serial.println();
-  pinMode(BUTPIN, INPUT_PULLUP);
+  pinMode(BUTPIN, INPUT);
+  pinMode(IPPIN, INPUT);
   attachInterrupt(digitalPinToInterrupt(BUTPIN), inputButton, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(IPPIN), ipButton, CHANGE);
   initLCD();
   initOTA();
   initFileSystem();
@@ -194,22 +216,31 @@ void setup()
   pwmController.setChannelPWM(RELAY2PIN, state.inv * 4096);
   pwmController.setChannelPWM(LEDPIN, state.inv * 4096);
 
+  pwmController.setChannelPWM(FANLED, 4096 - state.inv * 4096);
+  pwmController.setChannelPWM(TENLED, 4096 - state.inv * 4096);
+  pwmController.setChannelPWM(RELAY1LED, 4096 - state.inv * 4096);
+  pwmController.setChannelPWM(RELAY2LED, 4096 - state.inv * 4096);
+  pwmController.setChannelPWM(LEDLED, 4096 - state.inv * 4096);
+  pwmController.setChannelOn(DOP1LED);
+  pwmController.setChannelOn(DOP2LED);
+
   snprintf(line2, 17, "FW:%s  FS:%s", ver.fw, ver.fs);
   printLCD(2, "  ESP8266_AQUA  ", line2);
+  //WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3, WIFI_SHUTDOWN = 4, WIFI_RESUME = 8
   WiFi.persistent(false);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.hostname("ESP8266_AQUA");
+  WiFi.setOutputPower(12); //0 - 20.5 dBm
+  if (!WiFi.getAutoConnect())
+    WiFi.setAutoConnect(true);
+  if (!WiFi.getAutoReconnect())
+    WiFi.setAutoReconnect(true);
   WiFi_initSTA();
+  //WiFi_initAP_STA();
   STAconnected = WiFi.onStationModeConnected(&onStationConnected);
   STAgotIP = WiFi.onStationModeGotIP(&onStationGotIp);
   STAdisconnected = WiFi.onStationModeDisconnected(&onStationDisconnected);
   APconnected = WiFi.onSoftAPModeProbeRequestReceived(&onProbeRequestReceive);
-  WiFi.setOutputPower(12); //0 - 20.5 dBm
-  if (WiFi.getAutoConnect() != true)
-  {
-    WiFi.setAutoConnect(true);
-    WiFi.setAutoReconnect(true);
-  }
   configTime(timeZone * 3600, 0, "pool.ntp.org", "time.nist.gov", "ntp3.stratum2.ru");
   sensors.begin();
   rtc.begin();
@@ -225,10 +256,27 @@ void setup()
   pwmController.init();
   pwmController.setPWMFrequency(1500);
   //Serial.print(pwmController.getChannelPWM(0));
+  /*
+  Serial.print("FS_PHYS_ADDR: ");
+  Serial.println(FS_PHYS_ADDR); //DB000
+  Serial.print("FS_PHYS_SIZE: ");
+  Serial.println(FS_PHYS_SIZE);
+  Serial.print("FS_PHYS_PAGE: ");
+  Serial.println(FS_PHYS_PAGE);
+  Serial.print("FS_PHYS_BLOCK: ");
+  Serial.println(FS_PHYS_BLOCK);    
+  */
 }
-
 void loop()
 {
   ws.cleanupClients();
   ArduinoOTA.handle();
+  if (Serial.available() > 0)
+  {
+    str = Serial.readString();
+    if (str.indexOf("start") > -1)
+      flag.serDebug = 1;
+    if (str.indexOf("stop") > -1)
+      flag.serDebug = 0;
+  }
 }

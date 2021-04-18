@@ -2,7 +2,14 @@
     "files.associations": {
         "functional": "cpp",
         "array": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "bitset": "cpp",
+        "initializer_list": "cpp",
+        "regex": "cpp",
+        "sstream": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     },
     "platformio-ide.useDevelopmentPIOCore": true
 }
