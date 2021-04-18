@@ -128,14 +128,14 @@ struct opt_t
 };
 struct oldState_t
 {
-  uint8_t rel1 = 0;
-  uint8_t rel2 = 0;
-  uint8_t fan = 0;
-  uint8_t ten = 0;
-  uint8_t led = 0;
-  uint8_t mqtt = 0;  
-  uint8_t valNow = 0;
-  uint8_t perc = 0;    
+  int8_t rel1 = 0;
+  int8_t rel2 = 0;
+  int8_t fan = 0;
+  int8_t ten = 0;
+  int8_t led = 0;
+  int8_t mqtt = 0;  
+  int8_t valNow = 0;
+  int8_t perc = 0;    
   int8_t rssi = 0;
   uint16_t heapMin = 65000;
   float tempC = 12;

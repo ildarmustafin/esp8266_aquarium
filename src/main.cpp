@@ -115,8 +115,8 @@ void measure_datetime()
     oldState.heapMin = state.heapMin;
   }
   //Serial.printf("MaxBlockSize: %i | HeapFragm: %i%% | heapCur: %i | heapMin: %i \n", ESP.getMaxFreeBlockSize(), ESP.getHeapFragmentation(), state.heapCur, state.heapMin);
-  Serial.print(F("heapMin: "));
-  Serial.println(state.heapMin);
+  //Serial.print(F("heapMin: "));
+  //Serial.println(state.heapMin);
   //Serial.print("line1: %s\n", line1);
   //Serial.print("line2: %s\n", line2);
   //Serial.print("state.wifi: %i\n", state.wifi);
@@ -169,8 +169,7 @@ void send_data()
     flag.inc++;
     if (flag.inc >= 60)
     {
-      oldState.rssi = sendOnChange("rssi", "rssi", wifi.rssi, oldState.rssi);
-      Serial.printf("[SSE] RSSI: %i\n", wifi.rssi);      
+      oldState.rssi = sendOnChange("rssi", "rssi", wifi.rssi, oldState.rssi);    
       flag.inc = 0;
     }
     if (oldState.tempC != option.tempC && !isUpdating)

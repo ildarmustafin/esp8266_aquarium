@@ -1,6 +1,6 @@
 #include "MQTT_WS.h"
 
-byte sendOnChange(const char *key, const char *keyMQTT, byte state, byte state_old)
+int8_t sendOnChange(const char *key, const char *keyMQTT, int8_t state, int8_t state_old)
 {
   if (state != state_old && !isUpdating)
   {
