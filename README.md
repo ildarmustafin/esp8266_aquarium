@@ -53,6 +53,9 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_9.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_10.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_11.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/options_1Mb.JPG)
 
 [platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-red.svg
@@ -67,7 +70,3 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 [stars_path]:    https://github.com/ildarmustafin/esp8266_aquarium/stargazers
 [issues_svg]:    https://img.shields.io/github/issues/ildarmustafin/esp8266_aquarium.svg
 [issues_path]:   https://github.com/ildarmustafin/esp8266_aquarium/issues/
-<<<<<<< HEAD
-=======
-
->>>>>>> b503237e9353da6f29c195e1879bbcfdc3fc9ac9
