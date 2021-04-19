@@ -169,7 +169,8 @@ void send_data()
     flag.inc++;
     if (flag.inc >= 60)
     {
-      oldState.rssi = sendOnChange("rssi", "rssi", wifi.rssi, oldState.rssi);    
+      oldState.rssi = sendOnChange("rssi", "rssi", wifi.rssi, oldState.rssi);
+      //Serial.printf("[SSE] RSSI: %i\n", wifi.rssi);      
       flag.inc = 0;
     }
     if (oldState.tempC != option.tempC && !isUpdating)
@@ -215,11 +216,11 @@ void setup()
   pwmController.setChannelPWM(RELAY2PIN, state.inv * 4096);
   pwmController.setChannelPWM(LEDPIN, state.inv * 4096);
 
-  pwmController.setChannelPWM(FANLED, 4096 - state.inv * 4096);
-  pwmController.setChannelPWM(TENLED, 4096 - state.inv * 4096);
-  pwmController.setChannelPWM(RELAY1LED, 4096 - state.inv * 4096);
-  pwmController.setChannelPWM(RELAY2LED, 4096 - state.inv * 4096);
-  pwmController.setChannelPWM(LEDLED, 4096 - state.inv * 4096);
+  pwmController.setChannelPWM(FANLED, !state.inv * 4096);
+  pwmController.setChannelPWM(TENLED, !state.inv * 4096);
+  pwmController.setChannelPWM(RELAY1LED, !state.inv * 4096);
+  pwmController.setChannelPWM(RELAY2LED, !state.inv * 4096);
+  pwmController.setChannelPWM(LEDLED, !state.inv * 4096);
   pwmController.setChannelOn(DOP1LED);
   pwmController.setChannelOn(DOP2LED);
 
