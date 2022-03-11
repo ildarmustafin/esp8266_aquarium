@@ -45,18 +45,18 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 
 При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Возможность выбора порта для доступа на веб страницу.
  
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_1.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_2.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_3.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_4.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_5.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_6.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_7.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_8.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_9.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_10.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/mini_11.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/master/photo/options_1Mb.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_1.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_2.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_3.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_4.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_5.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_6.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_7.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_8.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_9.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_10.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_11.JPG)
+![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/options_1Mb.JPG)
 
 [platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-red.svg
 [platform_path]: https://platformio.org/platformio-ide
