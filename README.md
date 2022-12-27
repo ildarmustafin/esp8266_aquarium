@@ -59,7 +59,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 
 [platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-red.svg
 [platform_path]: https://platformio.org/platformio-ide
-[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-6.4.2-red.svg
+[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-6.4.4-red.svg
 [fw_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
 [fs_ver_svg]:    https://img.shields.io/badge/filesystem_version-2.9-blue.svg
 [fs_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
