@@ -57,13 +57,13 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_10.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_11.JPG)
 
-[platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-red.svg
+[platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-blue.svg
 [platform_path]: https://platformio.org/platformio-ide
-[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-6.4.5-red.svg
+[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-6.4.5-lime.svg
 [fw_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
-[fs_ver_svg]:    https://img.shields.io/badge/filesystem_version-2.10-blue.svg
+[fs_ver_svg]:    https://img.shields.io/badge/filesystem_version-2.10-lime.svg
 [fs_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
-[forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-Lime.svg
+[forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-blue.svg
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
 [stars_svg]:     https://img.shields.io/github/stars/ildarmustafin/esp8266_aquarium.svg
 [stars_path]:    https://github.com/ildarmustafin/esp8266_aquarium/stargazers
