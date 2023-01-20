@@ -17,8 +17,7 @@ Functions implemented in this project:
 13. Send JSON by WEBSOCKET. Connect to your_ip/ws.
 14. You can set static IP on options. IP dynamic, if options is empty.
 15. The transfer of the pins states to the browser occurs through SSE (Server Sent Events). Data is transferred on state changes
-16. Temperature control is carried out according to the algorithm https://alexgyver.ru/gyverrelay/ using hysteresis and speed feedback coefficient
-17. Backlight lcd by pressing a button. The duration is selected in the settings. At 0 - constant backlight
+16. Backlight lcd by pressing a button. The duration is selected in the settings. At 0 - constant backlight
 
 At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. Ability to select a port for access to a web page.
 
@@ -40,8 +39,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 13. Передача JSON по WEBSOCKET. Подключается к ваш_ip/ws.
 14. Возможно установить статический IP. IP динамический, при пустых строках в настройках.
 15. Передача состояния выводов в браузер происходит через SSE (Server Sent Events). Данные передаются при изменении состояния
-16. Регулировка температуры происходит по алгоритму https://alexgyver.ru/gyverrelay/ с использованием гистерезиса и коэффициента обратной связи по скорости
-17. Подсветка lcd по нажатию на кнопку. Длительность выбирается в настройках. При 0 - постоянная подсветка
+16. Подсветка lcd по нажатию на кнопку. Длительность выбирается в настройках. При 0 - постоянная подсветка
 
 При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Возможность выбора порта для доступа на веб страницу.
  
