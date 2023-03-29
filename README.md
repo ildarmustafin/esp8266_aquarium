@@ -48,12 +48,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_3.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_4.JPG)
 ![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_5.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_6.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_7.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_8.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_9.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_10.JPG)
-![screenshot](https://github.com/ildarmustafin/esp8266_aquarium/blob/main/photo/mini_11.JPG)
+
 
 [platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-blue.svg
 [platform_path]: https://platformio.org/platformio-ide
