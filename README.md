@@ -7,7 +7,7 @@ Functions implemented in this project:
 3. Turn on / off the heater by lowering-raising the temperature.
 4. Turn on / off the fan to increase or decrease the temperature.
 5. Turn on the LEDs on schedule. Dawn and sunset modes. MIN and MAX brightness are set in %.
-6. Scheduled 2 relays
+6. Scheduled 6 relays
 7. Inverse output states
 8. Firmware update via web interface. Output of real % file upload to server during firmware update
 9. Switch tabs with a swipe
@@ -29,7 +29,7 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 3. Включение-выключение нагревателя по понижению-повышению температуры.
 4. Включение-выключение вентилятора по повышению-понижению температуры.
 5. Включение светодиодов по расписанию. Режимы Рассвет и Закат. Мин и макс яркость выставляется в %.
-6. Работа 2 реле по расписанию
+6. Работа 6 реле по расписанию
 7. Инверсия состояния выводов
 8. Обновление прошивки через веб интерфейс. Вывод % реальной загрузки файла на сервер при обновлении прошивки 
 9. Переключение вкладок свайпом
@@ -57,9 +57,9 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 
 [platform_svg]:  https://img.shields.io/badge/platform-PlatformIO_IDE-blue.svg
 [platform_path]: https://platformio.org/platformio-ide
-[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-6.4.8-green.svg
+[fw_ver_svg]:    https://img.shields.io/badge/firmware_version-6.5.0_BETA-red.svg
 [fw_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
-[fs_ver_svg]:    https://img.shields.io/badge/filesystem_version-3.2-green.svg
+[fs_ver_svg]:    https://img.shields.io/badge/filesystem_version-4.1.0_BETA-red.svg
 [fs_ver_path]:   https://github.com/ildarmustafin/esp8266_aquarium/releases/latest
 [forum_svg]:     https://img.shields.io/badge/forum-on_esp8266.ru-red.svg
 [forum_path]:    https://esp8266.ru/forum/threads/akvarium-na-esp8266.4637
