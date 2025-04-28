@@ -13,11 +13,9 @@ Functions implemented in this project:
 9. Switch tabs with a swipe
 10. Connect to an existing access point. The ability to reconnect to the AP in case of loss and restoration of connection
 11. Added 2 languages (rus, eng). To add new languages, you must specify the abbreviated name of the language in the lang clause in the configSetup.json file. Next, use a file with the language rus.json or eng.json as a template, register your text and save it as the language name specified in lang
-12. Send JSON by MQTT. Data is not sending on empty options.
-13. Send JSON by WEBSOCKET. Connect to your_ip/ws.
-14. You can set static IP on options. IP dynamic, if options is empty.
-15. The transfer of the pins states to the browser occurs through SSE (Server Sent Events). Data is transferred on state changes
-16. Backlight lcd by pressing a button. The duration is selected in the settings. At 0 - constant backlight
+12. You can set static IP on options. IP dynamic, if options is empty.
+13. The transfer of the pins states to the browser occurs through SSE (Server Sent Events). Data is transferred on state changes
+14. Backlight lcd by pressing a button. The duration is selected in the settings. At 0 - constant backlight
 
 At the first connection, an ESP8266_AQUA access point is created without a password with the IP address 192.168.4.1. In the future, it is possible to change the name of the access point and set a password for it. When saving data to the server, the page does not reload. Data is loaded in json format with a GET request. Ability to select a port for access to a web page.
 
@@ -35,11 +33,9 @@ At the first connection, an ESP8266_AQUA access point is created without a passw
 9. Переключение вкладок свайпом
 10. Подключение к существующей точке доступа. Возможность переподключения к ТД при потере и восстановлении связи
 11. Добавлены 2 языка(rus,eng). Для добавления новых языков необходимо прописать сокращенное название языка в пункте lang в файле configSetup.json. Далее использовать как шаблон файл с языком rus.json или eng.json, прописать свой текст и сохранить как название языка, указанное в lang
-12. Передача JSON по MQTT. При пустых строках в настройке, передача данных не осуществляется.
-13. Передача JSON по WEBSOCKET. Подключается к ваш_ip/ws.
-14. Возможно установить статический IP. IP динамический, при пустых строках в настройках.
-15. Передача состояния выводов в браузер происходит через SSE (Server Sent Events). Данные передаются при изменении состояния
-16. Подсветка lcd по нажатию на кнопку. Длительность выбирается в настройках. При 0 - постоянная подсветка
+12. Возможно установить статический IP. IP динамический, при пустых строках в настройках.
+13. Передача состояния выводов в браузер происходит через SSE (Server Sent Events). Данные передаются при изменении состояния
+14. Подсветка lcd по нажатию на кнопку. Длительность выбирается в настройках. При 0 - постоянная подсветка
 
 При первом подключении создается точка доступа ESP8266_AQUA без пароля с IP адресом 192.168.4.1. В дальнейшем есть возможность изменить имя точки доступа и задать ей пароль. При сохранении данных на сервер страница не перезагружается. Данные загружаются в json формате GET запросом. Возможность выбора порта для доступа на веб страницу.
  
