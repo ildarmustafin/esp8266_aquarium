@@ -1,0 +1,14 @@
+{
+"text": [
+["Smooth [0.0~4.0]:", "right Gap [0~100]:"], 
+["1.Sunrise:","1.Sunset:","2.Sunrise:","2.Sunset:","3.Sunrise:","3.Sunset:","4.Sunrise:","4.Sunset:","5.Sunrise:","5.Sunset:","6.Sunrise:","6.Sunset:","Relay1:", "Interval:", "Duration:", "Relay2:", "Interval:", "Duration:", "Relay3:", "Interval:", "Duration:", "Relay4:", "Interval:", "Duration:", "Relay5:", "Interval:", "Duration:", "Relay6:", "Interval:", "Duration:", "LED:","FAN:","TEN:","Relay №1:","Relay №2:","Relay №3:","Relay №4:","Relay №5:","Relay №6:"], 
+["1.Max bright:","1.Min bright:","2.Max bright:","2.Min bright:","3.Max bright:","3.Min bright:","4.Max bright:","4.Min bright:","5.Max bright:","5.Min bright:","6.Max bright:","6.Min bright:", "Temperature correction:", "Fan setPoint:", "Fan Hysteresis:","Heater setPoint:", "Heater Hysteresis:","Bright delay:", "Inverse output:"], 
+["mqtt_server*:","mqtt_port*:","mqtt_ID*:","mqtt_user:","mqtt_password:","topic_all*:","topic_temp:","topic_led:","topic_fan:","topic_ten:","topic_date:","topic_rel1:","topic_rel2:","topic_rel3:","topic_rel4:","topic_rel5:","topic_rel6:"],
+["Date:","Time:","Timezone [GMT+]:","AP name:","Connect to WIFI:","IP-address / Gateway","Port:","Update:"] 
+],
+"popup":["Restart ESP8266-12E?", "Reboot is required", "Reset restart count?"],
+"but": ["Wait...", "Successful", "Error", "Repeat", "Manual enter", "Autosync", "Save", "Open", "Upload", "Restart controller"],
+"s_mode": ["Auto", "On", "Off"],
+"mes": ["--°C", "RTC ERROR"]
+}
+    

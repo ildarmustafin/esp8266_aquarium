@@ -1,0 +1,113 @@
+#Progress_Status {
+	width: 100%;
+	background-color: #ddd;
+}
+  
+#myprogressBar {
+	width: 1%;
+	height: 35px;
+	background-color: #3370B7;
+	text-align: center;
+	line-height: 32px;
+	color: white;
+}
+
+[tooltip_wifi]{
+    position: relative;
+}
+[tooltip_wifi]::after {
+    content: attr(tooltip_wifi);
+	font-size: 10px;
+	font-weight: bold;
+    position: absolute; 
+    width: 90px;
+	border-radius: 4px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 0.5em;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2; 
+	text-align: left;
+	padding-left:15px;
+	left: 25px;		
+} 
+[tooltip_wifi]:hover::after, [tooltip_temp]:hover::after, [tooltip_led]:hover::after, [tooltip_fan]:hover::after, [tooltip_ten]:hover::after, [tooltip_rel1]:hover::after, [tooltip_rel2]:hover::after {
+    opacity: 1;
+    top: 2em;
+}
+[tooltip_temp], [tooltip_led], [tooltip_fan], [tooltip_ten], [tooltip_rel1], [tooltip_rel2] {
+    position: relative;
+}
+[tooltip_temp]::after {
+    content: attr(tooltip_temp);
+	font-size: 10px;
+	font-weight: bold;
+    position: absolute; 
+    width: 85px;
+	border-radius: 4px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 0.5em;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;
+	text-align: left;
+	padding-left:15px;	
+	left: 25px;
+} 
+[tooltip_led]::after {
+    content: attr(tooltip_led);
+	font-size: 10px;
+	font-weight: bold;
+    position: absolute; 
+    width: 75px;
+	border-radius: 4px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 0.5em;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;	
+    white-space: break-spaces;	
+	text-align: left;
+	padding-left:15px;
+	left: 25px;	
+} 
+[tooltip_fan]::after {
+    content: attr(tooltip_fan);
+	font-size: 10px;
+	font-weight: bold;
+    position: absolute; 
+    width: 75px;
+	border-radius: 4px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 0.5em;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;	
+    white-space: break-spaces;	
+	text-align: left;
+	padding-left:15px;	
+	left: 25px;		
+} 
+[tooltip_ten]::after{
+    content: attr(tooltip_ten);
+	font-size: 10px;
+	font-weight: bold;
+    position: absolute; 
+    width: 75px;
+    left: 0%; 
+	border-radius: 4px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 0.5em;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;	
+    white-space: break-spaces;	
+	text-align: left;
+	padding-left:15px;	
+	left: 25px;		
+}
