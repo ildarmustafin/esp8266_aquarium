@@ -65,7 +65,7 @@ input:focus::placeholder {
   visibility: hidden;
 }
 input {
-	font-size:18px;
+	font-size:17px;
 /* 	display:flex; */
 	align-items:center;
 	justify-content:right;
